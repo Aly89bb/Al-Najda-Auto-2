@@ -1,0 +1,1200 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+<meta name="theme-color" content="#0D1B3E"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<title>نجدة أوتو — Najda Auto</title>
+<link rel="manifest" href="manifest.json"/>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{
+  --navy:#0D1B3E;
+  --navy-light:#162244;
+  --navy-dark:#080F22;
+  --gold:#C9A84C;
+  --gold-light:#E2C06A;
+  --gold-dark:#A8892E;
+  --orange:#F97316;
+  --red:#EF4444;
+  --green:#22C55E;
+  --slate:#1e293b;
+  --slate-light:#334155;
+  --text:#f8fafc;
+  --text-muted:#94a3b8;
+  --radius:14px;
+  --radius-sm:8px;
+  --shadow:0 4px 24px rgba(0,0,0,0.4);
+}
+html,body{height:100%;overflow:hidden}
+body{background:var(--navy-dark);color:var(--text);font-family:'Cairo','Inter',sans-serif;display:flex;flex-direction:column}
+#root{flex:1;display:flex;flex-direction:column;overflow:hidden}
+input,textarea,select,button{font-family:inherit}
+button{cursor:pointer;border:none;outline:none}
+::-webkit-scrollbar{width:3px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--gold);border-radius:2px}
+
+/* Animations */
+@keyframes fadeIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+@keyframes slideUp{from{transform:translateY(100%);opacity:0}to{transform:translateY(0);opacity:1}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
+@keyframes ping{0%{transform:scale(1);opacity:1}100%{transform:scale(2.2);opacity:0}}
+@keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes shimmer{0%{background-position:-200% 0}100%{background-position:200% 0}}
+@keyframes moveCar{0%{left:5%}100%{left:72%}}
+@keyframes ring{0%,100%{transform:rotate(0)}15%,45%{transform:rotate(-10deg)}30%,60%{transform:rotate(10deg)}}
+@keyframes glow{0%,100%{box-shadow:0 0 8px var(--gold)}50%{box-shadow:0 0 24px var(--gold-light),0 0 48px var(--gold)}}
+
+.fade-in{animation:fadeIn 0.35s ease-out}
+.slide-up{animation:slideUp 0.3s ease-out}
+.pulse-anim{animation:pulse 1.5s ease-in-out infinite}
+.bounce-anim{animation:bounce 1.2s ease-in-out infinite}
+.spin-anim{animation:spin 0.8s linear infinite}
+.ping-anim{animation:ping 1s cubic-bezier(0,0,0.2,1) infinite}
+.ring-anim{animation:ring 0.5s ease-in-out}
+.glow-anim{animation:glow 2s ease-in-out infinite}
+
+/* TopBar */
+.topbar{
+  background:var(--navy);
+  border-bottom:1px solid rgba(201,168,76,0.15);
+  padding:12px 16px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  flex-shrink:0;
+  z-index:50;
+  box-shadow:0 2px 12px rgba(0,0,0,0.3);
+}
+.topbar-logo{display:flex;align-items:center;gap:10px}
+.logo-img{width:38px;height:38px;border-radius:8px;object-fit:cover;border:1.5px solid var(--gold)}
+.logo-text{font-size:13px;font-weight:700;color:var(--gold);line-height:1.2}
+.logo-sub{font-size:10px;color:var(--text-muted);font-weight:400}
+.topbar-center{font-size:15px;font-weight:800;color:var(--text);letter-spacing:0.3px}
+.topbar-actions{display:flex;align-items:center;gap:10px}
+.notif-btn{
+  position:relative;width:38px;height:38px;
+  background:var(--slate);border-radius:10px;
+  display:flex;align-items:center;justify-content:center;
+  color:var(--text-muted);font-size:18px;
+  transition:all 0.2s;
+}
+.notif-btn:hover{background:var(--slate-light);color:var(--text)}
+.notif-badge{
+  position:absolute;top:-4px;right:-4px;
+  background:var(--red);color:#fff;
+  font-size:9px;font-weight:800;
+  width:18px;height:18px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  border:2px solid var(--navy-dark);
+}
+.back-btn{
+  width:36px;height:36px;background:rgba(255,255,255,0.08);
+  border-radius:9px;display:flex;align-items:center;justify-content:center;
+  color:var(--text);font-size:16px;transition:all 0.2s;
+}
+.back-btn:hover{background:rgba(255,255,255,0.14)}
+
+/* Main content */
+.main-content{flex:1;overflow-y:auto;overflow-x:hidden;padding-bottom:80px}
+
+/* Bottom Nav */
+.bottom-nav{
+  position:fixed;bottom:0;left:0;right:0;
+  background:var(--navy);
+  border-top:1px solid rgba(201,168,76,0.15);
+  display:flex;align-items:center;
+  padding:8px 0 env(safe-area-inset-bottom,8px);
+  z-index:50;
+  box-shadow:0 -4px 20px rgba(0,0,0,0.4);
+}
+.nav-item{
+  flex:1;display:flex;flex-direction:column;align-items:center;
+  gap:3px;padding:6px 4px;cursor:pointer;
+  color:var(--text-muted);font-size:10px;font-weight:600;
+  transition:all 0.2s;border-radius:10px;
+}
+.nav-item .nav-icon{font-size:20px;transition:transform 0.2s}
+.nav-item.active{color:var(--gold)}
+.nav-item.active .nav-icon{transform:scale(1.15)}
+.nav-sos{
+  flex:1;display:flex;flex-direction:column;align-items:center;
+  gap:3px;padding:4px;cursor:pointer;
+}
+.sos-circle{
+  width:52px;height:52px;
+  background:linear-gradient(135deg,var(--red),#c0392b);
+  border-radius:50%;display:flex;align-items:center;justify-content:center;
+  font-size:11px;font-weight:900;color:#fff;
+  box-shadow:0 4px 16px rgba(239,68,68,0.5);
+  border:3px solid rgba(255,255,255,0.15);
+  transition:transform 0.15s;
+  position:relative;top:-8px;
+}
+.sos-circle:active{transform:scale(0.94)}
+.sos-label{font-size:9px;color:var(--text-muted);font-weight:600;margin-top:-4px}
+
+/* Cards & UI */
+.card{
+  background:var(--slate);border-radius:var(--radius);
+  padding:16px;border:1px solid rgba(255,255,255,0.06);
+  box-shadow:var(--shadow);
+}
+.card-gold{border-color:rgba(201,168,76,0.25)}
+.btn{
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  padding:14px 20px;border-radius:var(--radius);font-size:15px;font-weight:700;
+  transition:all 0.18s;width:100%;
+}
+.btn:active{transform:scale(0.97)}
+.btn-primary{background:linear-gradient(135deg,var(--gold),var(--gold-dark));color:var(--navy-dark)}
+.btn-primary:hover{background:linear-gradient(135deg,var(--gold-light),var(--gold))}
+.btn-danger{background:linear-gradient(135deg,var(--red),#c0392b);color:#fff}
+.btn-danger:hover{background:linear-gradient(135deg,#f87171,var(--red))}
+.btn-outline{background:transparent;border:1.5px solid var(--gold);color:var(--gold)}
+.btn-outline:hover{background:rgba(201,168,76,0.1)}
+.btn-ghost{background:rgba(255,255,255,0.07);color:var(--text)}
+.btn-ghost:hover{background:rgba(255,255,255,0.12)}
+.btn-green{background:linear-gradient(135deg,var(--green),#16a34a);color:#fff}
+
+/* Form */
+.form-group{margin-bottom:14px}
+.form-label{display:block;font-size:12px;font-weight:700;color:var(--text-muted);margin-bottom:6px;letter-spacing:0.3px}
+.form-input{
+  width:100%;background:rgba(255,255,255,0.07);
+  border:1.5px solid rgba(255,255,255,0.1);border-radius:var(--radius-sm);
+  color:var(--text);font-size:14px;padding:11px 14px;
+  transition:border-color 0.2s;
+}
+.form-input:focus{outline:none;border-color:var(--gold);background:rgba(201,168,76,0.06)}
+.form-input::placeholder{color:var(--text-muted)}
+.form-select{
+  width:100%;background:rgba(255,255,255,0.07);
+  border:1.5px solid rgba(255,255,255,0.1);border-radius:var(--radius-sm);
+  color:var(--text);font-size:14px;padding:11px 14px;
+  appearance:none;cursor:pointer;
+}
+.form-select:focus{outline:none;border-color:var(--gold)}
+
+/* Sections */
+.section-title{
+  font-size:18px;font-weight:800;color:var(--text);
+  margin-bottom:4px;
+}
+.section-sub{font-size:12px;color:var(--text-muted);margin-bottom:16px}
+.divider{height:1px;background:rgba(255,255,255,0.07);margin:16px 0}
+
+/* Status badges */
+.badge{
+  display:inline-flex;align-items:center;gap:4px;
+  padding:4px 10px;border-radius:20px;font-size:11px;font-weight:700;
+}
+.badge-pending{background:rgba(249,115,22,0.15);color:var(--orange)}
+.badge-active{background:rgba(34,197,94,0.15);color:var(--green)}
+.badge-done{background:rgba(201,168,76,0.15);color:var(--gold)}
+.badge-cancelled{background:rgba(239,68,68,0.15);color:var(--red)}
+
+/* Modal / Sheet */
+.modal-overlay{
+  position:fixed;inset:0;background:rgba(0,0,0,0.7);
+  z-index:100;display:flex;align-items:flex-end;
+  backdrop-filter:blur(4px);
+}
+.modal-sheet{
+  background:var(--navy-light);border-radius:24px 24px 0 0;
+  padding:20px 16px;width:100%;max-height:90vh;overflow-y:auto;
+  border-top:2px solid rgba(201,168,76,0.2);
+}
+.modal-handle{width:40px;height:4px;background:rgba(255,255,255,0.2);border-radius:2px;margin:0 auto 16px}
+.modal-title{font-size:18px;font-weight:800;color:var(--text);margin-bottom:4px;text-align:center}
+.modal-sub{font-size:12px;color:var(--text-muted);text-align:center;margin-bottom:20px}
+
+/* Toast */
+.toast{
+  position:fixed;top:70px;left:50%;transform:translateX(-50%);
+  background:var(--slate-light);color:var(--text);
+  padding:10px 20px;border-radius:30px;font-size:13px;font-weight:600;
+  z-index:200;box-shadow:var(--shadow);white-space:nowrap;
+  border:1px solid rgba(255,255,255,0.1);
+}
+
+/* SOS Screen */
+.sos-page{padding:20px 16px;animation:fadeIn 0.35s ease-out}
+.sos-hero{
+  background:linear-gradient(135deg,var(--navy),var(--navy-light));
+  border-radius:20px;padding:28px 20px;text-align:center;
+  border:1.5px solid rgba(201,168,76,0.2);
+  margin-bottom:20px;position:relative;overflow:hidden;
+}
+.sos-hero::before{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(circle at 50% 0%,rgba(239,68,68,0.08) 0%,transparent 70%);
+}
+.sos-btn-main{
+  width:120px;height:120px;border-radius:50%;
+  background:linear-gradient(135deg,#ef4444,#b91c1c);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  margin:0 auto 16px;cursor:pointer;
+  box-shadow:0 8px 32px rgba(239,68,68,0.5),0 0 0 8px rgba(239,68,68,0.12);
+  border:3px solid rgba(255,255,255,0.2);
+  transition:transform 0.15s,box-shadow 0.15s;
+  font-size:32px;
+  position:relative;z-index:1;
+}
+.sos-btn-main:active{transform:scale(0.95);box-shadow:0 4px 16px rgba(239,68,68,0.5)}
+.sos-btn-label{font-size:12px;font-weight:800;color:#fff;letter-spacing:1px;margin-top:4px}
+
+/* Service tiers */
+.tier-card{
+  border-radius:var(--radius);padding:16px;
+  display:flex;align-items:center;gap:14px;
+  cursor:pointer;transition:all 0.2s;
+  border:1.5px solid rgba(255,255,255,0.08);
+  background:var(--slate);margin-bottom:12px;
+}
+.tier-card:active{transform:scale(0.98)}
+.tier-card.selected{border-color:var(--gold);background:rgba(201,168,76,0.08)}
+.tier-icon{font-size:28px;flex-shrink:0}
+.tier-info{flex:1}
+.tier-name{font-size:15px;font-weight:800;color:var(--text)}
+.tier-desc{font-size:11px;color:var(--text-muted);margin-top:2px}
+.tier-arrow{font-size:14px;color:var(--text-muted)}
+
+/* Tracking */
+.track-map{
+  height:160px;background:linear-gradient(135deg,#0f2027,#203a43,#2c5364);
+  border-radius:var(--radius);margin-bottom:14px;
+  position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center;
+}
+.track-road{
+  position:absolute;bottom:40%;left:0;right:0;height:6px;
+  background:rgba(255,255,255,0.2);border-radius:3px;
+}
+.track-car{
+  position:absolute;font-size:22px;bottom:calc(40% + 2px);
+  animation:moveCar 4s ease-in-out infinite alternate;
+}
+.track-dest{position:absolute;right:8%;bottom:calc(40% + 2px);font-size:20px}
+.track-status{
+  background:var(--slate);border-radius:var(--radius);padding:14px 16px;
+  display:flex;align-items:center;gap:14px;margin-bottom:12px;
+}
+.track-eta{
+  background:linear-gradient(135deg,var(--navy),var(--slate));
+  border-radius:var(--radius);padding:14px;
+  display:flex;align-items:center;justify-content:space-around;
+  border:1px solid rgba(201,168,76,0.15);
+}
+.eta-item{text-align:center}
+.eta-val{font-size:22px;font-weight:900;color:var(--gold)}
+.eta-label{font-size:10px;color:var(--text-muted);font-weight:600}
+
+/* Login */
+.login-page{
+  flex:1;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;padding:24px 20px;
+  animation:fadeIn 0.35s ease-out;
+}
+.login-logo{margin-bottom:28px;text-align:center}
+.login-title{font-size:24px;font-weight:900;color:var(--text);margin-bottom:4px}
+.login-sub{font-size:13px;color:var(--text-muted);margin-bottom:28px}
+.login-card{background:var(--slate);border-radius:20px;padding:24px 20px;width:100%;max-width:360px;border:1px solid rgba(201,168,76,0.15)}
+.role-tabs{display:flex;gap:8px;margin-bottom:20px;background:rgba(255,255,255,0.05);border-radius:10px;padding:4px}
+.role-tab{flex:1;padding:8px;border-radius:8px;font-size:12px;font-weight:700;color:var(--text-muted);background:transparent;text-align:center;cursor:pointer;transition:all 0.2s}
+.role-tab.active{background:var(--gold);color:var(--navy-dark)}
+
+/* Notifications */
+.notif-item{
+  padding:14px 0;display:flex;align-items:flex-start;gap:12px;
+  border-bottom:1px solid rgba(255,255,255,0.06);
+}
+.notif-icon{
+  width:40px;height:40px;border-radius:12px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:18px;flex-shrink:0;
+}
+.notif-icon.sos{background:rgba(239,68,68,0.15);color:var(--red)}
+.notif-icon.info{background:rgba(201,168,76,0.15);color:var(--gold)}
+.notif-icon.ok{background:rgba(34,197,94,0.15);color:var(--green)}
+.notif-text{flex:1}
+.notif-title{font-size:13px;font-weight:700;color:var(--text);margin-bottom:2px}
+.notif-body{font-size:11px;color:var(--text-muted)}
+.notif-time{font-size:10px;color:var(--text-muted);white-space:nowrap;margin-top:2px}
+
+/* Dashboard (Manager) */
+.stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px}
+.stat-card{
+  background:var(--slate);border-radius:var(--radius);padding:16px;
+  border:1px solid rgba(255,255,255,0.06);text-align:center;
+}
+.stat-val{font-size:28px;font-weight:900;color:var(--gold)}
+.stat-label{font-size:11px;color:var(--text-muted);font-weight:600;margin-top:4px}
+.request-item{
+  background:var(--slate);border-radius:var(--radius);padding:14px;
+  margin-bottom:10px;border:1px solid rgba(255,255,255,0.06);
+  animation:fadeIn 0.3s ease-out;
+}
+.request-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.request-id{font-size:12px;font-weight:700;color:var(--gold)}
+.request-info{font-size:13px;color:var(--text);margin-bottom:4px}
+.request-meta{font-size:11px;color:var(--text-muted)}
+.assign-row{display:flex;gap:8px;margin-top:10px}
+
+/* Profile / Settings */
+.profile-hero{
+  background:linear-gradient(135deg,var(--navy),var(--navy-light));
+  padding:24px 16px;text-align:center;margin-bottom:16px;
+}
+.profile-avatar{
+  width:72px;height:72px;border-radius:50%;
+  background:linear-gradient(135deg,var(--gold),var(--gold-dark));
+  display:flex;align-items:center;justify-content:center;
+  font-size:28px;margin:0 auto 12px;
+  border:3px solid rgba(255,255,255,0.15);
+}
+.profile-name{font-size:18px;font-weight:800;color:var(--text)}
+.profile-role{font-size:12px;color:var(--gold);font-weight:600;margin-top:2px}
+.setting-item{
+  display:flex;align-items:center;gap:12px;padding:14px 16px;
+  background:var(--slate);border-radius:var(--radius-sm);margin-bottom:8px;
+  cursor:pointer;transition:background 0.2s;
+}
+.setting-item:hover{background:var(--slate-light)}
+.setting-icon{font-size:20px;width:32px;text-align:center}
+.setting-label{flex:1;font-size:14px;font-weight:600;color:var(--text)}
+.setting-arrow{font-size:12px;color:var(--text-muted)}
+
+/* Loader */
+.loader{width:32px;height:32px;border:3px solid rgba(201,168,76,0.2);border-top-color:var(--gold);border-radius:50%;animation:spin 0.7s linear infinite}
+.loading-wrap{display:flex;align-items:center;justify-content:center;padding:40px;flex-direction:column;gap:12px}
+.loading-text{font-size:13px;color:var(--text-muted)}
+
+/* Mechanic */
+.mechanic-card{
+  background:var(--slate);border-radius:var(--radius);padding:14px;
+  display:flex;align-items:center;gap:12px;margin-bottom:10px;
+  border:1px solid rgba(255,255,255,0.06);
+}
+.mechanic-avatar{
+  width:44px;height:44px;border-radius:12px;
+  background:linear-gradient(135deg,var(--gold),var(--gold-dark));
+  display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;
+}
+.mechanic-info{flex:1}
+.mechanic-name{font-size:14px;font-weight:700;color:var(--text)}
+.mechanic-status{font-size:11px;color:var(--text-muted);margin-top:2px}
+.online-dot{width:8px;height:8px;background:var(--green);border-radius:50%;display:inline-block;margin-left:4px}
+.offline-dot{width:8px;height:8px;background:var(--text-muted);border-radius:50%;display:inline-block;margin-left:4px}
+
+/* Empty state */
+.empty-state{text-align:center;padding:48px 20px}
+.empty-icon{font-size:48px;margin-bottom:12px}
+.empty-title{font-size:16px;font-weight:700;color:var(--text);margin-bottom:6px}
+.empty-text{font-size:12px;color:var(--text-muted)}
+
+/* Splash */
+.splash{
+  position:fixed;inset:0;background:var(--navy-dark);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  z-index:300;
+}
+.splash-logo{
+  width:90px;height:90px;border-radius:20px;
+  background:linear-gradient(135deg,var(--gold),var(--gold-dark));
+  display:flex;align-items:center;justify-content:center;
+  font-size:42px;margin-bottom:20px;
+  box-shadow:0 12px 40px rgba(201,168,76,0.35);
+  animation:glow 2s ease-in-out infinite;
+}
+.splash-title{font-size:28px;font-weight:900;color:var(--text);margin-bottom:6px}
+.splash-sub{font-size:13px;color:var(--gold);font-weight:600;margin-bottom:32px}
+.splash-loader{width:200px;height:3px;background:rgba(255,255,255,0.1);border-radius:2px;overflow:hidden}
+.splash-progress{height:100%;background:linear-gradient(90deg,var(--gold),var(--gold-light));border-radius:2px;animation:splashLoad 2s ease-out forwards}
+@keyframes splashLoad{from{width:0}to{width:100%}}
+.splash-brand{margin-top:40px;font-size:11px;color:var(--text-muted);letter-spacing:1px}
+.splash-brand span{color:var(--gold);font-weight:700}
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.3.1/umd/react.production.min.js" crossorigin></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.3.1/umd/react-dom.production.min.js" crossorigin></script>
+
+<script>
+const {useState, useEffect, useRef, useCallback, useMemo} = React;
+
+// ─── Constants ───────────────────────────────────────────────
+const SUPABASE_URL = window.SUPABASE_URL || '';
+const SUPABASE_KEY = window.SUPABASE_KEY || '';
+
+const TIERS = [
+  { id: 'economy', icon: '🚗', name: 'الخدمة العادية', nameEn: 'Economy', desc: 'مساعدة أساسية على الطريق', color: '#64748b' },
+  { id: 'premium', icon: '💎', name: 'الخدمة المميزة', nameEn: 'Premium', desc: 'خدمة شاملة وأولوية مرتفعة', color: '#C9A84C' },
+  { id: 'vip', icon: '⚡', name: 'VIP طارئ', nameEn: 'VIP Urgent', desc: 'أقصى سرعة، أولوية قصوى', color: '#EF4444' },
+];
+
+const SERVICE_TYPES = [
+  { id: 'flat_tire', label: 'إطار مثقوب', icon: '🛞' },
+  { id: 'battery', label: 'بطارية فارغة', icon: '🔋' },
+  { id: 'fuel', label: 'نفاد الوقود', icon: '⛽' },
+  { id: 'engine', label: 'عطل في المحرك', icon: '⚙️' },
+  { id: 'towing', label: 'سحب السيارة', icon: '🚛' },
+  { id: 'lockout', label: 'مفتاح داخل السيارة', icon: '🔑' },
+  { id: 'accident', label: 'حادث / طوارئ', icon: '🚨' },
+  { id: 'other', label: 'أخرى', icon: '🔧' },
+];
+
+const MOCK_REQUESTS = [
+  { id: 'NJ-001', client: 'أحمد محمد', phone: '+222 36 XX XX XX', type: 'flat_tire', tier: 'premium', location: 'طريق نواكشوط-نواذيبو', status: 'pending', time: 'منذ 3 دقائق', mechanic: null },
+  { id: 'NJ-002', client: 'فاطمة السالم', phone: '+222 22 XX XX XX', type: 'battery', tier: 'economy', location: 'حي تيارت، نواكشوط', status: 'active', time: 'منذ 12 دقيقة', mechanic: 'محمود ولد إبراهيم' },
+  { id: 'NJ-003', client: 'محمد الأمين', phone: '+222 46 XX XX XX', type: 'towing', tier: 'vip', location: 'مطار نواكشوط الدولي', status: 'done', time: 'منذ 45 دقيقة', mechanic: 'سيدي محمد' },
+];
+
+const MOCK_MECHANICS = [
+  { id: 1, name: 'محمود ولد إبراهيم', specialty: 'إطارات • بطاريات', online: true, requests: 1 },
+  { id: 2, name: 'سيدي محمد', specialty: 'سحب • محركات', online: true, requests: 0 },
+  { id: 3, name: 'عبد الله ولد أحمد', specialty: 'كهرباء • عمومي', online: false, requests: 0 },
+  { id: 4, name: 'إبراهيم الشيخ', specialty: 'إطارات • سحب', online: true, requests: 2 },
+];
+
+const MOCK_NOTIFS = [
+  { id: 1, type: 'sos', title: 'طلب نجدة جديد!', body: 'NJ-001 — أحمد محمد — إطار مثقوب', time: 'منذ 3 دق', read: false },
+  { id: 2, type: 'ok', title: 'تم إغلاق الطلب NJ-003', body: 'سيدي محمد أنهى المهمة بنجاح', time: 'منذ 45 دق', read: false },
+  { id: 3, type: 'info', title: 'تسجيل دخول ميكانيكي', body: 'محمود ولد إبراهيم أصبح متاحاً', time: 'منذ 1 ساعة', read: true },
+];
+
+// ─── Utils ───────────────────────────────────────────────────
+function getServiceIcon(type) {
+  return SERVICE_TYPES.find(s => s.id === type)?.icon || '🔧';
+}
+function getServiceLabel(type) {
+  return SERVICE_TYPES.find(s => s.id === type)?.label || 'خدمة';
+}
+function getTierIcon(tier) {
+  return TIERS.find(t => t.id === tier)?.icon || '🚗';
+}
+
+// ─── Toast Hook ───────────────────────────────────────────────
+function useToast() {
+  const [toast, setToast] = useState(null);
+  const show = useCallback((msg, duration = 2500) => {
+    setToast(msg);
+    setTimeout(() => setToast(null), duration);
+  }, []);
+  return [toast, show];
+}
+
+// ─── Toast Component ──────────────────────────────────────────
+function Toast({ msg }) {
+  if (!msg) return null;
+  return React.createElement('div', { className: 'toast fade-in' }, msg);
+}
+
+// ─── Splash Screen ────────────────────────────────────────────
+function Splash({ onDone }) {
+  useEffect(() => {
+    const t = setTimeout(onDone, 2400);
+    return () => clearTimeout(t);
+  }, [onDone]);
+
+  return React.createElement('div', { className: 'splash' },
+    React.createElement('div', { className: 'splash-logo' }, '🚗'),
+    React.createElement('div', { className: 'splash-title' }, 'نجدة أوتو'),
+    React.createElement('div', { className: 'splash-sub' }, 'Najda Auto — خدمة المساعدة على الطريق'),
+    React.createElement('div', { className: 'splash-loader' },
+      React.createElement('div', { className: 'splash-progress' })
+    ),
+    React.createElement('div', { className: 'splash-brand' },
+      'Powered by ', React.createElement('span', null, 'A Planet T&L SUARL')
+    )
+  );
+}
+
+// ─── TopBar Component ─────────────────────────────────────────
+function TopBar({ title, onBack, onNotif, notifCount = 0, showLogo = false }) {
+  return React.createElement('div', { className: 'topbar' },
+    showLogo
+      ? React.createElement('div', { className: 'topbar-logo' },
+          React.createElement('div', { style: { width: 38, height: 38, borderRadius: 8, background: 'linear-gradient(135deg,#C9A84C,#A8892E)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18, border: '1.5px solid var(--gold)' } }, '🚗'),
+          React.createElement('div', null,
+            React.createElement('div', { className: 'logo-text' }, 'نجدة أوتو'),
+            React.createElement('div', { className: 'logo-sub' }, 'BRCC-AUTO')
+          )
+        )
+      : React.createElement('button', { className: 'back-btn', onClick: onBack }, '←'),
+    React.createElement('div', { className: 'topbar-center' }, title),
+    React.createElement('button', { className: 'notif-btn', onClick: onNotif },
+      '🔔',
+      notifCount > 0 && React.createElement('div', { className: 'notif-badge ping-anim' }, notifCount)
+    )
+  );
+}
+
+// ─── Bottom Nav Component ─────────────────────────────────────
+function BottomNav({ active, onNav, role }) {
+  const items = role === 'client'
+    ? [
+        { id: 'home', icon: '🏠', label: 'الرئيسية' },
+        { id: 'sos', icon: null, label: 'نجدة' },
+        { id: 'history', icon: '📋', label: 'طلباتي' },
+        { id: 'profile', icon: '👤', label: 'حسابي' },
+      ]
+    : role === 'mechanic'
+    ? [
+        { id: 'home', icon: '🏠', label: 'الرئيسية' },
+        { id: 'tasks', icon: '⚙️', label: 'المهام' },
+        { id: 'history', icon: '📋', label: 'السجل' },
+        { id: 'profile', icon: '👤', label: 'حسابي' },
+      ]
+    : [
+        { id: 'dashboard', icon: '📊', label: 'لوحة التحكم' },
+        { id: 'requests', icon: '🚨', label: 'الطلبات' },
+        { id: 'mechanics', icon: '👷', label: 'الميكانيكيون' },
+        { id: 'profile', icon: '⚙️', label: 'الإعدادات' },
+      ];
+
+  return React.createElement('nav', { className: 'bottom-nav' },
+    items.map(item => {
+      if (item.id === 'sos') {
+        return React.createElement('div', { key: 'sos', className: 'nav-sos', onClick: () => onNav('sos') },
+          React.createElement('div', { className: 'sos-circle' }, '🆘'),
+          React.createElement('div', { className: 'sos-label' }, 'SOS')
+        );
+      }
+      return React.createElement('div', {
+        key: item.id,
+        className: `nav-item ${active === item.id ? 'active' : ''}`,
+        onClick: () => onNav(item.id)
+      },
+        React.createElement('div', { className: 'nav-icon' }, item.icon),
+        React.createElement('div', null, item.label)
+      );
+    })
+  );
+}
+
+// ─── SOS Submit Screen ────────────────────────────────────────
+function SOSPage({ onSuccess, showToast }) {
+  const [step, setStep] = useState(1);
+  const [tier, setTier] = useState(null);
+  const [serviceType, setServiceType] = useState('');
+  const [location, setLocation] = useState('');
+  const [name, setName] = useState('');
+  const [phone, setPhone] = useState('');
+  const [notes, setNotes] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [locating, setLocating] = useState(false);
+
+  const detectLocation = () => {
+    setLocating(true);
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          setLocation(`${pos.coords.latitude.toFixed(5)}, ${pos.coords.longitude.toFixed(5)}`);
+          setLocating(false);
+          showToast('✅ تم تحديد موقعك');
+        },
+        () => {
+          setLocating(false);
+          showToast('⚠️ تعذر تحديد الموقع، أدخله يدوياً');
+        },
+        { timeout: 8000 }
+      );
+    } else {
+      setLocating(false);
+      showToast('⚠️ المتصفح لا يدعم تحديد الموقع');
+    }
+  };
+
+  const submit = () => {
+    if (!name.trim() || !phone.trim() || !location.trim() || !serviceType || !tier) {
+      showToast('⚠️ يرجى تعبئة جميع الحقول المطلوبة');
+      return;
+    }
+    setLoading(true);
+    // Simulate submission
+    setTimeout(() => {
+      setLoading(false);
+      onSuccess({ id: 'NJ-' + Math.floor(Math.random() * 900 + 100), name, phone, tier, serviceType, location });
+    }, 1800);
+  };
+
+  if (step === 1) {
+    return React.createElement('div', { className: 'sos-page' },
+      React.createElement('div', { className: 'sos-hero' },
+        React.createElement('div', { style: { fontSize: 40, marginBottom: 8 } }, '🆘'),
+        React.createElement('div', { style: { fontSize: 20, fontWeight: 900, marginBottom: 4 } }, 'اختر مستوى الخدمة'),
+        React.createElement('div', { style: { fontSize: 12, color: 'var(--text-muted)' } }, 'حدد نوع المساعدة التي تحتاجها')
+      ),
+      TIERS.map(t =>
+        React.createElement('div', {
+          key: t.id,
+          className: `tier-card ${tier === t.id ? 'selected' : ''}`,
+          onClick: () => setTier(t.id)
+        },
+          React.createElement('div', { className: 'tier-icon' }, t.icon),
+          React.createElement('div', { className: 'tier-info' },
+            React.createElement('div', { className: 'tier-name' }, t.name),
+            React.createElement('div', { className: 'tier-desc' }, t.desc)
+          ),
+          tier === t.id
+            ? React.createElement('div', { style: { color: 'var(--gold)', fontSize: 18 } }, '✓')
+            : React.createElement('div', { className: 'tier-arrow' }, '›')
+        )
+      ),
+      React.createElement('button', {
+        className: 'btn btn-primary',
+        style: { marginTop: 8 },
+        onClick: () => tier ? setStep(2) : showToast('⚠️ اختر مستوى الخدمة أولاً')
+      }, 'التالي ←')
+    );
+  }
+
+  if (step === 2) {
+    return React.createElement('div', { className: 'sos-page' },
+      React.createElement('div', { className: 'section-title' }, 'نوع العطل'),
+      React.createElement('div', { className: 'section-sub' }, 'ما الذي يحتاج إلى مساعدة؟'),
+      React.createElement('div', { style: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 20 } },
+        SERVICE_TYPES.map(s =>
+          React.createElement('div', {
+            key: s.id,
+            className: `tier-card ${serviceType === s.id ? 'selected' : ''}`,
+            style: { flexDirection: 'column', alignItems: 'center', padding: '14px 8px', gap: 6 },
+            onClick: () => setServiceType(s.id)
+          },
+            React.createElement('div', { style: { fontSize: 24 } }, s.icon),
+            React.createElement('div', { style: { fontSize: 12, fontWeight: 700, textAlign: 'center', color: serviceType === s.id ? 'var(--gold)' : 'var(--text)' } }, s.label)
+          )
+        )
+      ),
+      React.createElement('div', { style: { display: 'flex', gap: 8 } },
+        React.createElement('button', { className: 'btn btn-ghost', style: { flex: 1 }, onClick: () => setStep(1) }, '← رجوع'),
+        React.createElement('button', { className: 'btn btn-primary', style: { flex: 2 }, onClick: () => serviceType ? setStep(3) : showToast('⚠️ اختر نوع العطل') }, 'التالي ←')
+      )
+    );
+  }
+
+  return React.createElement('div', { className: 'sos-page' },
+    React.createElement('div', { className: 'section-title' }, 'بيانات الطلب'),
+    React.createElement('div', { className: 'section-sub' }, `${getTierIcon(tier)} ${TIERS.find(t=>t.id===tier)?.name} • ${getServiceIcon(serviceType)} ${getServiceLabel(serviceType)}`),
+    React.createElement('div', { className: 'form-group' },
+      React.createElement('label', { className: 'form-label' }, '👤 الاسم الكامل *'),
+      React.createElement('input', { className: 'form-input', placeholder: 'أدخل اسمك', value: name, onChange: e => setName(e.target.value) })
+    ),
+    React.createElement('div', { className: 'form-group' },
+      React.createElement('label', { className: 'form-label' }, '📱 رقم الهاتف *'),
+      React.createElement('input', { className: 'form-input', placeholder: '+222 XX XX XX XX', type: 'tel', value: phone, onChange: e => setPhone(e.target.value) })
+    ),
+    React.createElement('div', { className: 'form-group' },
+      React.createElement('label', { className: 'form-label' }, '📍 موقعك *'),
+      React.createElement('div', { style: { display: 'flex', gap: 8 } },
+        React.createElement('input', { className: 'form-input', placeholder: 'أدخل موقعك أو اضغط تحديد', value: location, onChange: e => setLocation(e.target.value), style: { flex: 1 } }),
+        React.createElement('button', {
+          className: 'btn btn-outline',
+          style: { width: 48, padding: '11px 0', fontSize: 18, flexShrink: 0 },
+          onClick: detectLocation
+        }, locating ? React.createElement('div', { className: 'loader', style: { width: 16, height: 16, borderWidth: 2 } }) : '📍')
+      )
+    ),
+    React.createElement('div', { className: 'form-group' },
+      React.createElement('label', { className: 'form-label' }, '📝 ملاحظات (اختياري)'),
+      React.createElement('textarea', { className: 'form-input', placeholder: 'وصف إضافي للعطل...', rows: 2, value: notes, onChange: e => setNotes(e.target.value), style: { resize: 'none' } })
+    ),
+    React.createElement('div', { style: { display: 'flex', gap: 8 } },
+      React.createElement('button', { className: 'btn btn-ghost', style: { flex: 1 }, onClick: () => setStep(2), disabled: loading }, '← رجوع'),
+      React.createElement('button', { className: 'btn btn-danger', style: { flex: 2 }, onClick: submit, disabled: loading },
+        loading
+          ? React.createElement(React.Fragment, null, React.createElement('div', { className: 'loader', style: { width: 18, height: 18, borderWidth: 2, borderTopColor: '#fff' } }), 'جارٍ الإرسال...')
+          : '🆘 إرسال طلب النجدة'
+      )
+    )
+  );
+}
+
+// ─── Tracking Screen ──────────────────────────────────────────
+function TrackingPage({ request, onClose }) {
+  const [eta, setEta] = useState(Math.floor(Math.random() * 10 + 5));
+  useEffect(() => {
+    const t = setInterval(() => setEta(e => e > 1 ? e - 1 : 1), 60000);
+    return () => clearInterval(t);
+  }, []);
+
+  return React.createElement('div', { className: 'sos-page' },
+    React.createElement('div', { style: { textAlign: 'center', marginBottom: 20 } },
+      React.createElement('div', { style: { fontSize: 14, color: 'var(--gold)', fontWeight: 700, marginBottom: 4 } }, `طلب #${request.id}`),
+      React.createElement('div', { style: { fontSize: 22, fontWeight: 900 } }, 'الميكانيكي في الطريق إليك'),
+      React.createElement('div', { style: { fontSize: 12, color: 'var(--text-muted)', marginTop: 4 } }, 'تابع موقعه في الوقت الفعلي')
+    ),
+    React.createElement('div', { className: 'track-map' },
+      React.createElement('div', { className: 'track-road' }),
+      React.createElement('div', { className: 'track-car' }, '🚙'),
+      React.createElement('div', { className: 'track-dest' }, '📍'),
+      React.createElement('div', { style: { position: 'absolute', top: 8, right: 8, background: 'rgba(0,0,0,0.6)', borderRadius: 8, padding: '4px 8px', fontSize: 10, color: '#fff' } }, '🗺️ نواكشوط، موريتانيا')
+    ),
+    React.createElement('div', { className: 'track-eta', style: { marginBottom: 14 } },
+      React.createElement('div', { className: 'eta-item' },
+        React.createElement('div', { className: 'eta-val' }, `${eta}`),
+        React.createElement('div', { className: 'eta-label' }, 'دقيقة تقريباً')
+      ),
+      React.createElement('div', { style: { width: 1, height: 36, background: 'rgba(255,255,255,0.1)' } }),
+      React.createElement('div', { className: 'eta-item' },
+        React.createElement('div', { className: 'eta-val', style: { fontSize: 16 } }, '📞'),
+        React.createElement('div', { className: 'eta-label' }, 'اتصل بالميكانيكي')
+      ),
+      React.createElement('div', { style: { width: 1, height: 36, background: 'rgba(255,255,255,0.1)' } }),
+      React.createElement('div', { className: 'eta-item' },
+        React.createElement('div', { className: 'eta-val', style: { fontSize: 16, color: 'var(--green)' } }, '✓'),
+        React.createElement('div', { className: 'eta-label' }, 'مؤكد')
+      )
+    ),
+    React.createElement('div', { className: 'track-status' },
+      React.createElement('div', { style: { fontSize: 28 } }, '👷'),
+      React.createElement('div', { style: { flex: 1 } },
+        React.createElement('div', { style: { fontSize: 14, fontWeight: 700, color: 'var(--text)' } }, 'محمود ولد إبراهيم'),
+        React.createElement('div', { style: { fontSize: 11, color: 'var(--text-muted)', marginTop: 2 } }, `${getTierIcon(request.tier)} ${TIERS.find(t=>t.id===request.tier)?.name} • ${getServiceIcon(request.serviceType)} ${getServiceLabel(request.serviceType)}`)
+      ),
+      React.createElement('div', { style: { textAlign: 'center' } },
+        React.createElement('div', { style: { width: 10, height: 10, background: 'var(--green)', borderRadius: '50%', margin: '0 auto 4px' }, className: 'ping-anim' }),
+        React.createElement('div', { style: { fontSize: 10, color: 'var(--green)', fontWeight: 700 } }, 'متصل')
+      )
+    ),
+    React.createElement('button', { className: 'btn btn-outline', onClick: onClose, style: { marginTop: 4 } }, 'إلغاء الطلب')
+  );
+}
+
+// ─── Client Home ──────────────────────────────────────────────
+function ClientHome({ onSOS, unreadCount }) {
+  return React.createElement('div', { style: { padding: '16px', animation: 'fadeIn 0.35s ease-out' } },
+    // Welcome banner
+    React.createElement('div', { style: { background: 'linear-gradient(135deg,var(--navy),var(--navy-light))', borderRadius: 'var(--radius)', padding: '20px 16px', marginBottom: 16, border: '1px solid rgba(201,168,76,0.15)' } },
+      React.createElement('div', { style: { fontSize: 11, color: 'var(--gold)', fontWeight: 700, marginBottom: 4, letterSpacing: 1 } }, 'BRCC-AUTO — NAJDA AUTO'),
+      React.createElement('div', { style: { fontSize: 20, fontWeight: 900, color: 'var(--text)', marginBottom: 4 } }, 'مرحباً بك 👋'),
+      React.createElement('div', { style: { fontSize: 12, color: 'var(--text-muted)' } }, 'نحن هنا على مدار الساعة لمساعدتك على الطريق')
+    ),
+    // SOS Button
+    React.createElement('div', { style: { background: 'rgba(239,68,68,0.07)', borderRadius: 'var(--radius)', padding: '20px', textAlign: 'center', marginBottom: 16, border: '1.5px solid rgba(239,68,68,0.2)', cursor: 'pointer' }, onClick: onSOS },
+      React.createElement('div', { style: { fontSize: 60, marginBottom: 8 } }, '🆘'),
+      React.createElement('div', { style: { fontSize: 18, fontWeight: 900, color: '#ef4444', marginBottom: 4 } }, 'اضغط للاستغاثة'),
+      React.createElement('div', { style: { fontSize: 12, color: 'var(--text-muted)' } }, 'احصل على مساعدة فورية على الطريق')
+    ),
+    // Services
+    React.createElement('div', { className: 'section-title', style: { marginBottom: 12 } }, 'خدماتنا'),
+    React.createElement('div', { style: { display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 10, marginBottom: 16 } },
+      SERVICE_TYPES.slice(0,6).map(s =>
+        React.createElement('div', { key: s.id, style: { background: 'var(--slate)', borderRadius: 12, padding: '12px 6px', textAlign: 'center', border: '1px solid rgba(255,255,255,0.06)' } },
+          React.createElement('div', { style: { fontSize: 22, marginBottom: 6 } }, s.icon),
+          React.createElement('div', { style: { fontSize: 10, color: 'var(--text-muted)', fontWeight: 600, lineHeight: 1.3 } }, s.label)
+        )
+      )
+    ),
+    // Footer brand
+    React.createElement('div', { style: { textAlign: 'center', padding: '16px 0 4px', borderTop: '1px solid rgba(255,255,255,0.07)' } },
+      React.createElement('div', { style: { fontSize: 10, color: 'var(--text-muted)', letterSpacing: 0.5 } }, 'Powered by '),
+      React.createElement('div', { style: { fontSize: 11, color: 'var(--gold)', fontWeight: 700 } }, 'A Planet T&L SUARL')
+    )
+  );
+}
+
+// ─── History Screen ───────────────────────────────────────────
+function HistoryPage() {
+  const items = [
+    { id: 'NJ-003', type: 'flat_tire', tier: 'premium', date: '29 يونيو 2026', status: 'done' },
+    { id: 'NJ-098', type: 'battery', tier: 'economy', date: '15 يونيو 2026', status: 'done' },
+    { id: 'NJ-071', type: 'towing', tier: 'vip', date: '3 يونيو 2026', status: 'cancelled' },
+  ];
+  return React.createElement('div', { style: { padding: 16, animation: 'fadeIn 0.35s ease-out' } },
+    React.createElement('div', { className: 'section-title', style: { marginBottom: 4 } }, 'سجل طلباتي'),
+    React.createElement('div', { className: 'section-sub' }, 'جميع طلبات المساعدة السابقة'),
+    items.map(item =>
+      React.createElement('div', { key: item.id, className: 'request-item' },
+        React.createElement('div', { className: 'request-header' },
+          React.createElement('div', { className: 'request-id' }, `#${item.id}`),
+          React.createElement('span', { className: `badge badge-${item.status}` }, item.status === 'done' ? '✓ مكتمل' : '✗ ملغي')
+        ),
+        React.createElement('div', { className: 'request-info' }, `${getServiceIcon(item.type)} ${getServiceLabel(item.type)} • ${getTierIcon(item.tier)} ${TIERS.find(t=>t.id===item.tier)?.name}`),
+        React.createElement('div', { className: 'request-meta' }, `📅 ${item.date}`)
+      )
+    )
+  );
+}
+
+// ─── Notifications ────────────────────────────────────────────
+function NotificationsPage({ notifs, onRead }) {
+  return React.createElement('div', { style: { padding: 16, animation: 'fadeIn 0.35s ease-out' } },
+    React.createElement('div', { className: 'section-title', style: { marginBottom: 4 } }, 'الإشعارات'),
+    React.createElement('div', { className: 'section-sub' }, `${notifs.filter(n => !n.read).length} غير مقروء`),
+    notifs.length === 0
+      ? React.createElement('div', { className: 'empty-state' },
+          React.createElement('div', { className: 'empty-icon' }, '🔔'),
+          React.createElement('div', { className: 'empty-title' }, 'لا توجد إشعارات'),
+          React.createElement('div', { className: 'empty-text' }, 'ستظهر هنا إشعاراتك')
+        )
+      : notifs.map(n =>
+          React.createElement('div', { key: n.id, className: 'notif-item', onClick: () => onRead(n.id), style: { opacity: n.read ? 0.6 : 1 } },
+            React.createElement('div', { className: `notif-icon ${n.type}` }, n.type === 'sos' ? '🚨' : n.type === 'ok' ? '✅' : 'ℹ️'),
+            React.createElement('div', { className: 'notif-text' },
+              React.createElement('div', { className: 'notif-title' }, n.title),
+              React.createElement('div', { className: 'notif-body' }, n.body)
+            ),
+            React.createElement('div', { className: 'notif-time' }, n.time)
+          )
+        )
+  );
+}
+
+// ─── Profile ──────────────────────────────────────────────────
+function ProfilePage({ user, onLogout }) {
+  const settings = [
+    { icon: '👤', label: 'معلومات الحساب' },
+    { icon: '🔒', label: 'تغيير كلمة المرور' },
+    { icon: '🔔', label: 'إعدادات الإشعارات' },
+    { icon: '🌐', label: 'اللغة — العربية' },
+    { icon: '📞', label: 'تواصل معنا' },
+    { icon: '📋', label: 'الشروط والأحكام' },
+  ];
+  return React.createElement('div', { style: { animation: 'fadeIn 0.35s ease-out' } },
+    React.createElement('div', { className: 'profile-hero' },
+      React.createElement('div', { className: 'profile-avatar' }, user.role === 'manager' ? '👔' : user.role === 'mechanic' ? '👷' : '👤'),
+      React.createElement('div', { className: 'profile-name' }, user.name),
+      React.createElement('div', { className: 'profile-role' }, user.role === 'manager' ? 'مدير — BRCC-AUTO' : user.role === 'mechanic' ? 'ميكانيكي' : 'عميل'),
+      React.createElement('div', { style: { fontSize: 12, color: 'var(--text-muted)', marginTop: 4 } }, user.phone)
+    ),
+    React.createElement('div', { style: { padding: '0 16px' } },
+      settings.map((s, i) =>
+        React.createElement('div', { key: i, className: 'setting-item' },
+          React.createElement('div', { className: 'setting-icon' }, s.icon),
+          React.createElement('div', { className: 'setting-label' }, s.label),
+          React.createElement('div', { className: 'setting-arrow' }, '‹')
+        )
+      ),
+      React.createElement('div', { style: { height: 16 } }),
+      React.createElement('button', { className: 'btn btn-danger', onClick: onLogout }, '🚪 تسجيل الخروج'),
+      React.createElement('div', { style: { textAlign: 'center', padding: '16px 0 4px' } },
+        React.createElement('div', { style: { fontSize: 10, color: 'var(--text-muted)' } }, 'Najda Auto v1.0 — A Planet T&L SUARL © 2026')
+      )
+    )
+  );
+}
+
+// ─── Manager Dashboard ────────────────────────────────────────
+function ManagerDashboard({ requests, mechanics }) {
+  const pending = requests.filter(r => r.status === 'pending').length;
+  const active = requests.filter(r => r.status === 'active').length;
+  const onlineMech = mechanics.filter(m => m.online).length;
+  const done = requests.filter(r => r.status === 'done').length;
+
+  return React.createElement('div', { style: { padding: 16, animation: 'fadeIn 0.35s ease-out' } },
+    React.createElement('div', { style: { fontSize: 11, color: 'var(--gold)', fontWeight: 700, marginBottom: 12, letterSpacing: 1 } }, '📊 لوحة التحكم — BRCC-AUTO'),
+    React.createElement('div', { className: 'stat-grid' },
+      React.createElement('div', { className: 'stat-card', style: { borderColor: 'rgba(239,68,68,0.3)' } },
+        React.createElement('div', { className: 'stat-val', style: { color: 'var(--red)' } }, pending),
+        React.createElement('div', { className: 'stat-label' }, '🚨 طلبات معلقة')
+      ),
+      React.createElement('div', { className: 'stat-card', style: { borderColor: 'rgba(201,168,76,0.3)' } },
+        React.createElement('div', { className: 'stat-val' }, active),
+        React.createElement('div', { className: 'stat-label' }, '⚙️ قيد التنفيذ')
+      ),
+      React.createElement('div', { className: 'stat-card', style: { borderColor: 'rgba(34,197,94,0.3)' } },
+        React.createElement('div', { className: 'stat-val', style: { color: 'var(--green)' } }, onlineMech),
+        React.createElement('div', { className: 'stat-label' }, '👷 ميكانيكيون متاحون')
+      ),
+      React.createElement('div', { className: 'stat-card' },
+        React.createElement('div', { className: 'stat-val', style: { color: 'var(--green)', fontSize: 20 } }, done),
+        React.createElement('div', { className: 'stat-label' }, '✅ مكتملة اليوم')
+      )
+    ),
+    React.createElement('div', { className: 'section-title', style: { marginBottom: 10 } }, 'آخر الطلبات'),
+    requests.slice(0,3).map(r =>
+      React.createElement('div', { key: r.id, className: 'request-item' },
+        React.createElement('div', { className: 'request-header' },
+          React.createElement('div', { className: 'request-id' }, `#${r.id}`),
+          React.createElement('span', { className: `badge badge-${r.status}` },
+            r.status === 'pending' ? '⏳ معلق' : r.status === 'active' ? '🔧 جارٍ' : '✓ مكتمل'
+          )
+        ),
+        React.createElement('div', { className: 'request-info' }, `${r.client} • ${getServiceIcon(r.type)} ${getServiceLabel(r.type)}`),
+        React.createElement('div', { className: 'request-meta' }, `📍 ${r.location} • ${r.time}`)
+      )
+    )
+  );
+}
+
+// ─── Manager Requests ─────────────────────────────────────────
+function ManagerRequests({ requests, mechanics, showToast }) {
+  const [selected, setSelected] = useState(null);
+  return React.createElement('div', { style: { padding: 16, animation: 'fadeIn 0.35s ease-out' } },
+    React.createElement('div', { className: 'section-title', style: { marginBottom: 4 } }, 'طلبات النجدة'),
+    React.createElement('div', { className: 'section-sub' }, `${requests.length} طلب إجمالاً`),
+    requests.map(r =>
+      React.createElement('div', { key: r.id, className: 'request-item' },
+        React.createElement('div', { className: 'request-header' },
+          React.createElement('div', { className: 'request-id' }, `#${r.id} • ${getTierIcon(r.tier)}`),
+          React.createElement('span', { className: `badge badge-${r.status}` },
+            r.status === 'pending' ? '⏳ معلق' : r.status === 'active' ? '🔧 جارٍ' : '✓ مكتمل'
+          )
+        ),
+        React.createElement('div', { className: 'request-info' }, `👤 ${r.client} — ${r.phone}`),
+        React.createElement('div', { className: 'request-meta', style: { marginBottom: 4 } }, `${getServiceIcon(r.type)} ${getServiceLabel(r.type)} • 📍 ${r.location}`),
+        React.createElement('div', { className: 'request-meta' }, `🕐 ${r.time}${r.mechanic ? ` • 👷 ${r.mechanic}` : ''}`),
+        r.status === 'pending' && React.createElement('div', { className: 'assign-row' },
+          React.createElement('select', {
+            className: 'form-select',
+            style: { flex: 1, fontSize: 12, padding: '8px 10px' },
+            defaultValue: '',
+            onChange: e => { if(e.target.value) showToast(`✅ تم تعيين ${e.target.value}`); }
+          },
+            React.createElement('option', { value: '', disabled: true }, 'تعيين ميكانيكي...'),
+            mechanics.filter(m => m.online).map(m =>
+              React.createElement('option', { key: m.id, value: m.name }, `${m.name} (${m.requests} مهام)`)
+            )
+          )
+        )
+      )
+    )
+  );
+}
+
+// ─── Manager Mechanics ────────────────────────────────────────
+function ManagerMechanics({ mechanics }) {
+  return React.createElement('div', { style: { padding: 16, animation: 'fadeIn 0.35s ease-out' } },
+    React.createElement('div', { className: 'section-title', style: { marginBottom: 4 } }, 'فريق الميكانيكيين'),
+    React.createElement('div', { className: 'section-sub' }, `${mechanics.filter(m=>m.online).length} متاح • ${mechanics.filter(m=>!m.online).length} غير متاح`),
+    mechanics.map(m =>
+      React.createElement('div', { key: m.id, className: 'mechanic-card' },
+        React.createElement('div', { className: 'mechanic-avatar' }, '👷'),
+        React.createElement('div', { className: 'mechanic-info' },
+          React.createElement('div', { className: 'mechanic-name' }, m.name),
+          React.createElement('div', { className: 'mechanic-status' }, m.specialty)
+        ),
+        React.createElement('div', { style: { textAlign: 'center' } },
+          React.createElement('div', { className: m.online ? 'badge badge-active' : 'badge badge-cancelled', style: { marginBottom: 4 } },
+            m.online ? '● متصل' : '○ غير متصل'
+          ),
+          m.requests > 0 && React.createElement('div', { style: { fontSize: 10, color: 'var(--gold)' } }, `${m.requests} مهام`)
+        )
+      )
+    )
+  );
+}
+
+// ─── Mechanic Tasks ───────────────────────────────────────────
+function MechanicTasks({ showToast }) {
+  const tasks = [
+    { id: 'NJ-002', client: 'فاطمة السالم', type: 'battery', location: 'حي تيارت، نواكشوط', tier: 'economy', status: 'active' },
+    { id: 'NJ-005', client: 'عمر ولد سيدي', type: 'flat_tire', location: 'طريق الامل', tier: 'premium', status: 'pending' },
+  ];
+  return React.createElement('div', { style: { padding: 16, animation: 'fadeIn 0.35s ease-out' } },
+    React.createElement('div', { className: 'section-title', style: { marginBottom: 4 } }, 'مهامي'),
+    React.createElement('div', { className: 'section-sub' }, 'الطلبات المعينة لي'),
+    tasks.map(t =>
+      React.createElement('div', { key: t.id, className: 'request-item' },
+        React.createElement('div', { className: 'request-header' },
+          React.createElement('div', { className: 'request-id' }, `#${t.id} • ${getTierIcon(t.tier)}`),
+          React.createElement('span', { className: `badge badge-${t.status}` }, t.status === 'active' ? '🔧 جارٍ' : '⏳ معلق')
+        ),
+        React.createElement('div', { className: 'request-info' }, `👤 ${t.client}`),
+        React.createElement('div', { className: 'request-meta', style: { marginBottom: 10 } }, `${getServiceIcon(t.type)} ${getServiceLabel(t.type)} • 📍 ${t.location}`),
+        React.createElement('div', { style: { display: 'flex', gap: 8 } },
+          React.createElement('button', { className: 'btn btn-ghost', style: { flex: 1, padding: '10px', fontSize: 12 } }, '📍 الملاحة'),
+          React.createElement('button', { className: 'btn btn-green', style: { flex: 1, padding: '10px', fontSize: 12 }, onClick: () => showToast('✅ تم تأكيد إنجاز المهمة') }, '✓ إنهاء')
+        )
+      )
+    )
+  );
+}
+
+// ─── Login Screen ─────────────────────────────────────────────
+function LoginPage({ onLogin }) {
+  const [role, setRole] = useState('manager');
+  const [phone, setPhone] = useState('');
+  const [pass, setPass] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  const doLogin = () => {
+    if (!phone.trim() || !pass.trim()) return;
+    setLoading(true);
+    setTimeout(() => {
+      setLoading(false);
+      const names = { manager: 'محمد النعمان', mechanic: 'محمود ولد إبراهيم' };
+      onLogin({ role, phone, name: names[role] || phone, pass });
+    }, 1200);
+  };
+
+  return React.createElement('div', { className: 'login-page' },
+    React.createElement('div', { className: 'login-logo' },
+      React.createElement('div', { style: { fontSize: 52, marginBottom: 8 } }, '🚗'),
+      React.createElement('div', { className: 'login-title' }, 'نجدة أوتو'),
+      React.createElement('div', { className: 'login-sub' }, 'بوابة الدخول الإداري')
+    ),
+    React.createElement('div', { className: 'login-card' },
+      React.createElement('div', { className: 'role-tabs' },
+        React.createElement('div', { className: `role-tab ${role === 'manager' ? 'active' : ''}`, onClick: () => setRole('manager') }, '👔 مدير'),
+        React.createElement('div', { className: `role-tab ${role === 'mechanic' ? 'active' : ''}`, onClick: () => setRole('mechanic') }, '👷 ميكانيكي')
+      ),
+      React.createElement('div', { className: 'form-group' },
+        React.createElement('label', { className: 'form-label' }, '📱 رقم الهاتف'),
+        React.createElement('input', { className: 'form-input', placeholder: '+222 XX XX XX XX', type: 'tel', value: phone, onChange: e => setPhone(e.target.value) })
+      ),
+      React.createElement('div', { className: 'form-group' },
+        React.createElement('label', { className: 'form-label' }, '🔒 كلمة المرور'),
+        React.createElement('input', { className: 'form-input', placeholder: '••••••••', type: 'password', value: pass, onChange: e => setPass(e.target.value) })
+      ),
+      React.createElement('button', { className: 'btn btn-primary', onClick: doLogin, disabled: loading },
+        loading
+          ? React.createElement(React.Fragment, null, React.createElement('div', { className: 'loader', style: { width: 18, height: 18, borderWidth: 2 } }), 'جارٍ الدخول...')
+          : '🔐 تسجيل الدخول'
+      )
+    ),
+    React.createElement('div', { style: { marginTop: 20, textAlign: 'center' } },
+      React.createElement('div', { style: { fontSize: 11, color: 'var(--text-muted)', marginBottom: 4 } }, 'هل أنت عميل؟'),
+      React.createElement('button', { className: 'btn btn-ghost', style: { maxWidth: 200, padding: '10px', fontSize: 12 }, onClick: () => onLogin({ role: 'client', name: 'زائر', phone: '' }) }, '🚗 دخول العميل'),
+      React.createElement('div', { style: { marginTop: 16, fontSize: 10, color: 'var(--text-muted)' } }, 'A Planet T&L SUARL © 2026 — BRCC-AUTO')
+    )
+  );
+}
+
+// ─── Root App ─────────────────────────────────────────────────
+function App() {
+  const [splashDone, setSplashDone] = useState(false);
+  const [user, setUser] = useState(null);
+  const [page, setPage] = useState('home');
+  const [showNotifs, setShowNotifs] = useState(false);
+  const [notifs, setNotifs] = useState(MOCK_NOTIFS);
+  const [requests, setRequests] = useState(MOCK_REQUESTS);
+  const [mechanics] = useState(MOCK_MECHANICS);
+  const [activeRequest, setActiveRequest] = useState(null);
+  const [toast, showToast] = useToast();
+
+  const unread = notifs.filter(n => !n.read).length;
+
+  const handleLogin = (u) => { setUser(u); setPage('home'); };
+  const handleLogout = () => { setUser(null); setPage('home'); };
+  const handleNav = (p) => { setPage(p); setShowNotifs(false); };
+
+  const handleSOSSuccess = (req) => {
+    const newReq = { ...req, type: req.serviceType, status: 'active', location: req.location, time: 'الآن', mechanic: null };
+    setRequests(prev => [newReq, ...prev]);
+    setNotifs(prev => [{ id: Date.now(), type: 'sos', title: 'طلب نجدة جديد!', body: `${req.id} — ${req.name}`, time: 'الآن', read: false }, ...prev]);
+    setActiveRequest(req);
+    setPage('tracking');
+    showToast('🆘 تم إرسال طلبك! الميكانيكي في الطريق...');
+  };
+
+  const handleReadNotif = (id) => {
+    setNotifs(prev => prev.map(n => n.id === id ? { ...n, read: true } : n));
+  };
+
+  const renderPage = () => {
+    if (showNotifs) {
+      return React.createElement(NotificationsPage, { notifs, onRead: handleReadNotif });
+    }
+
+    // Client flow
+    if (!user || user.role === 'client') {
+      if (page === 'sos') return React.createElement(SOSPage, { onSuccess: handleSOSSuccess, showToast });
+      if (page === 'tracking') return React.createElement(TrackingPage, { request: activeRequest, onClose: () => { setPage('home'); setActiveRequest(null); } });
+      if (page === 'history') return React.createElement(HistoryPage);
+      if (page === 'profile') return React.createElement(ProfilePage, { user: user || { role: 'client', name: 'زائر', phone: '' }, onLogout: () => { setUser(null); setPage('home'); } });
+      return React.createElement(ClientHome, { onSOS: () => setPage('sos'), unreadCount: unread });
+    }
+
+    // Manager flow
+    if (user.role === 'manager') {
+      if (page === 'requests') return React.createElement(ManagerRequests, { requests, mechanics, showToast });
+      if (page === 'mechanics') return React.createElement(ManagerMechanics, { mechanics });
+      if (page === 'profile') return React.createElement(ProfilePage, { user, onLogout: handleLogout });
+      return React.createElement(ManagerDashboard, { requests, mechanics });
+    }
+
+    // Mechanic flow
+    if (user.role === 'mechanic') {
+      if (page === 'tasks') return React.createElement(MechanicTasks, { showToast });
+      if (page === 'profile') return React.createElement(ProfilePage, { user, onLogout: handleLogout });
+      return React.createElement('div', { style: { padding: 16, animation: 'fadeIn 0.35s ease-out' } },
+        React.createElement('div', { style: { textAlign: 'center', padding: '40px 0 20px' } },
+          React.createElement('div', { style: { fontSize: 48, marginBottom: 12 } }, '👷'),
+          React.createElement('div', { style: { fontSize: 18, fontWeight: 800 } }, `مرحباً ${user.name}`),
+          React.createElement('div', { style: { fontSize: 12, color: 'var(--text-muted)', marginTop: 4 } }, 'ميكانيكي — BRCC-AUTO')
+        ),
+        React.createElement('div', { style: { display: 'flex', gap: 12, marginBottom: 16 } },
+          React.createElement('div', { className: 'stat-card', style: { flex: 1, background: 'rgba(34,197,94,0.1)', borderColor: 'rgba(34,197,94,0.3)' } },
+            React.createElement('div', { className: 'stat-val', style: { color: 'var(--green)' } }, '2'),
+            React.createElement('div', { className: 'stat-label' }, 'مهام اليوم')
+          ),
+          React.createElement('div', { className: 'stat-card', style: { flex: 1 } },
+            React.createElement('div', { className: 'stat-val' }, '14'),
+            React.createElement('div', { className: 'stat-label' }, 'هذا الشهر')
+          )
+        ),
+        React.createElement('button', { className: 'btn btn-primary', onClick: () => setPage('tasks') }, '⚙️ عرض مهامي')
+      );
+    }
+  };
+
+  const getTitle = () => {
+    if (showNotifs) return 'الإشعارات';
+    if (!user || user.role === 'client') {
+      const titles = { home: 'نجدة أوتو', sos: 'طلب المساعدة', tracking: 'تتبع الميكانيكي', history: 'سجل الطلبات', profile: 'حسابي' };
+      return titles[page] || 'نجدة أوتو';
+    }
+    if (user.role === 'manager') {
+      const t = { home: 'لوحة التحكم', dashboard: 'لوحة التحكم', requests: 'الطلبات', mechanics: 'الميكانيكيون', profile: 'الإعدادات' };
+      return t[page] || 'BRCC-AUTO';
+    }
+    const t = { home: 'الرئيسية', tasks: 'مهامي', history: 'السجل', profile: 'حسابي' };
+    return t[page] || 'نجدة أوتو';
+  };
+
+  if (!splashDone) return React.createElement(Splash, { onDone: () => setSplashDone(true) });
+  if (!user && page !== 'home' && page !== 'sos' && page !== 'tracking') {
+    // Show login for non-client routes if needed
+  }
+
+  // Show login if no user and accessing admin area
+  if (!user) {
+    return React.createElement(React.Fragment, null,
+      React.createElement(Toast, { msg: toast }),
+      React.createElement('div', { id: 'app', style: { display: 'flex', flexDirection: 'column', height: '100%' } },
+        React.createElement(TopBar, {
+          title: getTitle(),
+          showLogo: page === 'home',
+          onBack: page !== 'home' ? () => setPage('home') : null,
+          onNotif: () => setShowNotifs(!showNotifs),
+          notifCount: unread
+        }),
+        React.createElement('div', { className: 'main-content' }, renderPage()),
+        React.createElement(BottomNav, { active: showNotifs ? '' : page, onNav: handleNav, role: 'client' }),
+        React.createElement('div', { style: { position: 'fixed', bottom: 70, left: '50%', transform: 'translateX(-50%)', zIndex: 40, background: 'rgba(0,0,0,0.7)', borderRadius: 20, padding: '6px 14px', fontSize: 11, color: 'var(--text-muted)', border: '1px solid rgba(255,255,255,0.1)', whiteSpace: 'nowrap' } },
+          '👔 مدير؟ ', React.createElement('span', { style: { color: 'var(--gold)', cursor: 'pointer', fontWeight: 700 }, onClick: () => { /* show login modal */ setUser({role:'manager',name:'محمد النعمان',phone:''}); setPage('home'); } }, 'دخول هنا')
+        )
+      )
+    );
+  }
+
+  return React.createElement(React.Fragment, null,
+    React.createElement(Toast, { msg: toast }),
+    React.createElement('div', { id: 'app', style: { display: 'flex', flexDirection: 'column', height: '100%' } },
+      React.createElement(TopBar, {
+        title: getTitle(),
+        showLogo: (page === 'home' || page === 'dashboard') && !showNotifs,
+        onBack: (page !== 'home' && page !== 'dashboard') ? () => { setShowNotifs(false); setPage('home'); } : null,
+        onNotif: () => setShowNotifs(!showNotifs),
+        notifCount: unread
+      }),
+      React.createElement('div', { className: 'main-content' }, renderPage()),
+      React.createElement(BottomNav, { active: showNotifs ? '' : page, onNav: handleNav, role: user.role })
+    )
+  );
+}
+
+// ─── Render ───────────────────────────────────────────────────
+ReactDOM.render(React.createElement(App), document.getElementById('root'));
+</script>
+</body>
+</html>
