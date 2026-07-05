@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1180 360" width="1180" height="360">
+<defs>
+<linearGradient id="gr2" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFC22E"/><stop offset="1" stop-color="#E0A310"/></linearGradient>
+</defs>
+<g>
+<path d="M 292.85,185.91 L 311.35,193.11 L 309.12,207.44 L 289.30,208.67 L 274.77,241.54 L 287.20,257.03 L 278.10,268.33 L 260.32,259.48 L 231.30,280.68 L 234.32,300.31 L 220.79,305.54 L 209.82,288.99 L 174.09,292.85 L 166.89,311.35 L 152.56,309.12 L 151.33,289.30 L 118.46,274.77 L 102.97,287.20 L 91.67,278.10 L 100.52,260.32 L 79.32,231.30 L 59.69,234.32 L 54.46,220.79 L 71.01,209.82 L 67.15,174.09 L 48.65,166.89 L 50.88,152.56 L 70.70,151.33 L 85.23,118.46 L 72.80,102.97 L 81.90,91.67 L 99.68,100.52 L 128.70,79.32 L 125.68,59.69 L 139.21,54.46 L 150.18,71.01 L 185.91,67.15 L 193.11,48.65 L 207.44,50.88 L 208.67,70.70 L 241.54,85.23 L 257.03,72.80 L 268.33,81.90 L 259.48,99.68 L 280.68,128.70 L 300.31,125.68 L 305.54,139.21 L 288.99,150.18 Z" fill="url(#gr2)"/>
+<circle cx="180" cy="180.0" r="101" fill="#0E1A2E"/>
+<rect x="89.8" y="169.8" width="35.6" height="4.0" rx="2.0" fill="#FF6A00"/><rect x="79.2" y="180.3" width="46.2" height="4.0" rx="2.0" fill="#FF6A00"/><rect x="92.4" y="190.9" width="33.0" height="4.0" rx="2.0" fill="#FF6A00"/>
+<rect x="132.5" y="173.0" width="103.0" height="21.1" rx="9.2" fill="#F4F7FB"/><path d="M 153.6,173.0 L 164.2,149.3 L 206.4,149.3 L 218.3,173.0 Z" fill="#F4F7FB"/><path d="M 158.9,170.4 L 166.2,154.6 L 182.7,154.6 L 182.7,170.4 Z" fill="#0E1A2E"/><path d="M 188.0,170.4 L 188.0,154.6 L 203.8,154.6 L 213.0,170.4 Z" fill="#0E1A2E"/><circle cx="153.6" cy="195.5" r="14.5" fill="#10233F"/><circle cx="153.6" cy="195.5" r="5.9" fill="#FFC22E"/><circle cx="218.3" cy="195.5" r="14.5" fill="#10233F"/><circle cx="218.3" cy="195.5" r="5.9" fill="#FFC22E"/>
+</g>
+<text x="372" y="150" font-family="Arial, Helvetica, sans-serif" font-weight="800" font-size="86" fill="#FFFFFF" letter-spacing="1">AL NAJDA <tspan fill="#FFC22E">AUTO</tspan></text>
+<text x="372" y="210" font-family="Arial, Helvetica, sans-serif" font-weight="700" font-size="34" fill="#FF6A00" letter-spacing="6">BRCC <tspan fill="#9AA6B6" font-weight="600" letter-spacing="4">· ROADSIDE ASSISTANCE</tspan></text>
+<text x="372" y="278" font-family="Arial, sans-serif" font-weight="700" font-size="52" fill="#FFFFFF" direction="rtl">النجدة أوتو</text>
+</svg>
