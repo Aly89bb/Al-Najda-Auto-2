@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 230" width="600" height="230">
+<defs>
+<linearGradient id="bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0E2340"/><stop offset="1" stop-color="#0A1A30"/></linearGradient>
+<linearGradient id="gr" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFC22E"/><stop offset="1" stop-color="#E0A310"/></linearGradient>
+</defs>
+<rect x="0" y="0" width="600" height="230" rx="18" fill="url(#bg)"/>
+<path d="M 131.9,57.1 L 147.7,61.2 L 146.7,69.0 L 130.4,68.8 L 123.9,86.2 L 136.3,96.8 L 132.0,103.4 L 117.4,96.2 L 104.0,109.0 L 110.6,123.9 L 103.8,128.0 L 93.8,115.1 L 76.1,120.9 L 75.6,137.2 L 67.8,137.9 L 64.3,122.0 L 45.9,119.5 L 38.4,134.0 L 31.0,131.2 L 34.8,115.4 L 19.3,105.2 L 6.2,115.0 L 0.7,109.3 L 11.0,96.6 L 1.5,80.7 L -14.5,83.9 L -17.0,76.3 L -2.2,69.4 L -3.9,50.9 L -19.7,46.8 L -18.7,39.0 L -2.4,39.2 L 4.1,21.8 L -8.3,11.2 L -4.0,4.6 L 10.6,11.8 L 24.0,-1.0 L 17.4,-15.9 L 24.2,-20.0 L 34.2,-7.1 L 51.9,-12.9 L 52.4,-29.2 L 60.2,-29.9 L 63.7,-14.0 L 82.1,-11.5 L 89.6,-26.0 L 97.0,-23.2 L 93.2,-7.4 L 108.7,2.8 L 121.8,-7.0 L 127.3,-1.3 L 117.0,11.4 L 126.5,27.3 L 142.5,24.1 L 145.0,31.7 L 130.2,38.6 Z" fill="#FFC22E" opacity="0.07"/>
+<path d="M 645.9,200.4 L 667.6,206.2 L 666.1,217.4 L 643.6,217.4 L 634.3,242.4 L 651.3,257.1 L 645.1,266.5 L 624.9,256.8 L 605.6,275.3 L 614.6,295.9 L 604.9,301.7 L 590.9,284.1 L 565.5,292.4 L 564.6,314.8 L 553.4,315.9 L 548.4,294.0 L 521.9,290.5 L 511.4,310.3 L 500.8,306.3 L 505.9,284.5 L 483.5,269.8 L 465.5,283.1 L 457.6,275.0 L 471.7,257.4 L 457.9,234.5 L 435.8,238.7 L 432.3,227.9 L 452.6,218.2 L 450.1,191.6 L 428.4,185.8 L 429.9,174.6 L 452.4,174.6 L 461.7,149.6 L 444.7,134.9 L 450.9,125.5 L 471.1,135.2 L 490.4,116.7 L 481.4,96.1 L 491.1,90.3 L 505.1,107.9 L 530.5,99.6 L 531.4,77.2 L 542.6,76.1 L 547.6,98.0 L 574.1,101.5 L 584.6,81.7 L 595.2,85.7 L 590.1,107.5 L 612.5,122.2 L 630.5,108.9 L 638.4,117.0 L 624.3,134.6 L 638.1,157.5 L 660.2,153.3 L 663.7,164.1 L 643.4,173.8 Z" fill="#FF6A00" opacity="0.07"/>
+<rect x="150" y="146" width="16" height="56" rx="4" fill="url(#gr)"/>
+<rect x="316" y="146" width="16" height="56" rx="4" fill="url(#gr)"/>
+<rect x="120" y="146" width="242" height="11" rx="5" fill="url(#gr)"/>
+<g transform="translate(0,-8)"><rect x="151.0" y="113.2" width="180.0" height="37.2" rx="15.6" fill="#F4F7FB"/><path d="M 178.6,113.2 L 201.4,73.6 L 283.0,73.6 L 303.4,113.2" fill="#F4F7FB"/><path d="M 190.6,109.6 L 206.2,82.0 L 237.4,82.0 L 237.4,109.6" fill="#0E2340"/><path d="M 245.8,109.6 L 245.8,82.0 L 278.2,82.0 L 293.8,109.6" fill="#0E2340"/><circle cx="183.4" cy="152.8" r="20.4" fill="#0E1A2E"/><circle cx="183.4" cy="152.8" r="9.0" fill="#FFC22E"/><circle cx="298.6" cy="152.8" r="20.4" fill="#0E1A2E"/><circle cx="298.6" cy="152.8" r="9.0" fill="#FFC22E"/><circle cx="331.0" cy="130.0" r="6.6" fill="#FF6A00"/></g>
+<rect x="24" y="200" width="552" height="6" rx="3" fill="#1c2634"/>
+<line x1="40" y1="203" x2="120" y2="203" stroke="#FF6A00" stroke-width="3" stroke-dasharray="10,10" opacity="0.6"/>
+<text x="410" y="120" font-family="Arial, sans-serif" font-weight="800" font-size="40" fill="#F4F7FB">BRCC</text>
+<text x="410" y="150" font-family="Arial, sans-serif" font-weight="800" font-size="22" fill="#FFC22E" letter-spacing="4">AUTO</text>
+<text x="410" y="174" font-family="Arial, sans-serif" font-weight="600" font-size="10.5" fill="#8291A6" letter-spacing="1.5">ROADSIDE ASSISTANCE</text>
+</svg>
