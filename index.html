@@ -1,0 +1,1484 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"/>
+<title>AL Najda Auto BRCC</title>
+<meta name="theme-color" content="#14171C"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="apple-mobile-web-app-title" content="Najda Auto BRCC"/>
+<link rel="manifest" href="manifest.json"/>
+<link rel="apple-touch-icon" href="najda-icon-192.png"/>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{
+  --charcoal:#14171C;--charcoal-2:#1B1F28;--charcoal-3:#232833;
+  --navy:#0E2340;--navy-2:#132C4E;
+  --orange:#FF6A00;--orange-d:#E85D00;--yellow:#FFC22E;--red:#E23744;--green:#22C55E;
+  --text:#EEF1F5;--muted:#93A0B2;
+  --line:rgba(255,255,255,0.08);--glass:rgba(18,23,32,0.72);
+  --radius:16px;--radius-sm:10px;--shadow:0 12px 34px rgba(0,0,0,0.45);
+  --ease:cubic-bezier(0.25,1,0.5,1);--spring:cubic-bezier(0.34,1.56,0.64,1);
+}
+html,body{height:100%;overflow:hidden}
+body{background:var(--charcoal);color:var(--text);font-family:'Cairo','Inter',sans-serif;display:flex;flex-direction:column;
+  -webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;text-rendering:optimizeLegibility}
+#root{flex:1;display:flex;flex-direction:column;overflow:hidden}
+button{cursor:pointer;border:none;outline:none;font-family:inherit;color:inherit}
+input,select,textarea{font-family:inherit}
+::-webkit-scrollbar{width:3px}::-webkit-scrollbar-thumb{background:var(--orange);border-radius:2px}
+@keyframes fadeIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+@keyframes pop{0%{transform:scale(.7);opacity:0}60%{transform:scale(1.06)}100%{transform:scale(1);opacity:1}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.45}}
+@media (prefers-reduced-motion:reduce){*{animation-duration:.001ms!important;transition-duration:.001ms!important}}
+.fade-in{animation:fadeIn .4s var(--ease)}
+.app{flex:1;display:flex;flex-direction:column;overflow:hidden;position:relative}
+.scroll{flex:1;overflow-y:auto;overflow-x:hidden}
+.pad{padding:18px}
+.loader{width:18px;height:18px;border:2px solid rgba(255,255,255,.25);border-top-color:var(--orange);border-radius:50%;animation:spin .7s linear infinite;display:inline-block}
+/* Top bar (glass) */
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:calc(12px + env(safe-area-inset-top)) 16px 12px;
+  background:var(--glass);backdrop-filter:blur(20px) saturate(140%);-webkit-backdrop-filter:blur(20px) saturate(140%);
+  border-bottom:1px solid var(--line);flex-shrink:0;z-index:50}
+.topbar-brand{display:flex;align-items:center;gap:10px}
+.topbar-brand img{width:34px;height:34px;border-radius:9px}
+.topbar-brand .tt{font-size:14px;font-weight:800;line-height:1}
+.topbar-brand .ts{font-size:9px;color:var(--yellow);font-weight:700;letter-spacing:1px}
+.topbar-right{display:flex;align-items:center;gap:8px}
+/* Lang switch */
+.lang{display:flex;gap:2px;background:var(--charcoal-3);border-radius:9px;padding:2px;border:1px solid var(--line)}
+.lang button{background:transparent;color:var(--muted);font-size:11px;font-weight:800;padding:5px 8px;border-radius:7px;min-width:28px;line-height:1;transition:all .15s}
+.lang button.on{background:var(--orange);color:#fff}
+/* Buttons */
+.btn{display:flex;align-items:center;justify-content:center;gap:8px;padding:14px 18px;border-radius:var(--radius-sm);
+  font-size:15px;font-weight:800;width:100%;transition:transform .14s var(--spring),background .2s,opacity .2s}
+.btn:active{transform:scale(.97)}.btn:disabled{opacity:.55}
+.btn-primary{background:var(--orange);color:#fff;box-shadow:0 6px 18px rgba(255,106,0,.32)}
+.btn-yellow{background:var(--yellow);color:#3a2600}
+.btn-outline{background:transparent;border:1.5px solid var(--line);color:var(--text)}
+.btn-ghost{background:var(--charcoal-3);color:var(--text)}
+.btn-sm{padding:9px 14px;font-size:13px;border-radius:9px;width:auto}
+/* Cards / inputs */
+.card{background:var(--charcoal-2);border:1px solid var(--line);border-radius:var(--radius);padding:16px;box-shadow:0 2px 10px rgba(0,0,0,.2)}
+.field{margin-bottom:14px}
+.label{display:block;font-size:12px;font-weight:700;color:var(--muted);margin-bottom:7px}
+.input{width:100%;background:rgba(255,255,255,.05);border:1.5px solid var(--line);border-radius:var(--radius-sm);
+  color:var(--text);font-size:15px;padding:13px 14px;transition:border-color .2s}
+.input:focus{border-color:var(--orange)}
+.section-title{font-size:15px;font-weight:800;margin-bottom:12px}
+.hint{font-size:12px;color:var(--muted);line-height:1.6}
+.badge{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:800;padding:4px 10px;border-radius:20px}
+.badge-orange{background:rgba(255,106,0,.14);color:var(--orange)}
+.badge-green{background:rgba(34,197,94,.14);color:var(--green)}
+.badge-muted{background:rgba(255,255,255,.06);color:var(--muted)}
+
+/* ── Phase 2: client flow ── */
+.tier{display:flex;align-items:center;gap:14px;padding:18px 16px;border-radius:var(--radius);border:2px solid var(--line);background:var(--charcoal-2);cursor:pointer;margin-bottom:12px;transition:transform .14s var(--spring),border-color .2s}
+.tier:active{transform:scale(.98)}
+.tier.premium{border-color:rgba(255,194,46,.4);background:linear-gradient(135deg,rgba(255,194,46,.08),var(--charcoal-2))}
+.tier .tic{width:52px;height:52px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:26px;background:var(--navy);flex-shrink:0}
+.tier.premium .tic{background:rgba(255,194,46,.15)}
+.step-head{display:flex;align-items:center;gap:8px;margin-bottom:14px}
+.step-num{width:26px;height:26px;border-radius:50%;background:var(--orange);color:#fff;font-size:13px;font-weight:800;display:flex;align-items:center;justify-content:center}
+.media-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:10px}
+.media-item{position:relative;aspect-ratio:1;border-radius:10px;overflow:hidden;border:1px solid var(--line);background:var(--navy)}
+.media-item img,.media-item video{width:100%;height:100%;object-fit:cover}
+.media-item .rm{position:absolute;top:3px;inset-inline-end:3px;width:20px;height:20px;border-radius:50%;background:rgba(0,0,0,.7);color:#fff;font-size:12px;display:flex;align-items:center;justify-content:center}
+.media-item .vtag{position:absolute;bottom:3px;inset-inline-start:3px;font-size:12px}
+.up-btn{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;aspect-ratio:1;border-radius:10px;border:1.5px dashed var(--line);background:rgba(255,255,255,.03);color:var(--muted);font-size:11px;font-weight:700}
+.pm-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}
+.pm-card{background:#fff;border:2px solid transparent;border-radius:12px;padding:9px 6px;display:flex;flex-direction:column;align-items:center;gap:5px;cursor:pointer;transition:transform .14s var(--spring)}
+.pm-card:active{transform:scale(.96)}
+.pm-card.sel{border-color:var(--orange);box-shadow:0 0 0 3px rgba(255,106,0,.22)}
+.pm-card img{width:44px;height:44px;object-fit:contain}
+.pm-card .pmc{width:44px;height:44px;display:flex;align-items:center;justify-content:center;font-size:30px}
+.pm-card .pmn{font-size:10px;font-weight:800;color:#1a2340;text-align:center;line-height:1.1}
+.stepper{display:flex;align-items:flex-start;justify-content:space-between;margin:6px 4px 18px;position:relative}
+.stp{display:flex;flex-direction:column;align-items:center;gap:6px;flex:1;z-index:2}
+.stp-dot{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:15px;background:var(--charcoal-3);color:var(--muted);border:2px solid var(--line);transition:all .3s var(--spring)}
+.stp.done .stp-dot{background:linear-gradient(135deg,var(--orange),var(--orange-d));color:#fff;border-color:var(--orange);box-shadow:0 0 14px rgba(255,106,0,.5)}
+.stp.on .stp-dot{background:var(--navy-2);color:var(--orange);border-color:var(--orange);animation:pulse 1.6s infinite}
+.stp-lb{font-size:9.5px;font-weight:700;color:var(--muted);text-align:center;max-width:64px}
+.stp.done .stp-lb,.stp.on .stp-lb{color:var(--orange)}
+.stp-line{position:absolute;top:18px;height:3px;background:var(--line);z-index:1;border-radius:2px}
+.stp-line.fill{background:linear-gradient(90deg,var(--orange),var(--orange-d))}
+.call-btn{display:flex;align-items:center;justify-content:center;gap:6px;background:var(--green);color:#fff;font-size:13px;font-weight:800;padding:10px 14px;border-radius:10px;text-decoration:none}
+
+/* ── Phase 3: admin/mechanic ── */
+.tabs{display:flex;gap:6px;margin-bottom:14px;background:var(--charcoal-2);border-radius:12px;padding:4px}
+.tab{flex:1;text-align:center;padding:9px 4px;border-radius:9px;font-size:12px;font-weight:800;color:var(--muted);background:transparent;transition:all .2s;position:relative}
+.tab.on{background:var(--orange);color:#fff}
+.tab .cnt{position:absolute;top:2px;inset-inline-end:6px;font-size:9px;background:var(--red);color:#fff;border-radius:8px;padding:0 4px;min-width:14px}
+.req-card{background:var(--charcoal-2);border:1px solid var(--line);border-radius:14px;padding:14px;margin-bottom:11px;cursor:pointer;transition:transform .14s var(--spring)}
+.req-card:active{transform:scale(.985)}
+.req-top{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:6px}
+.req-name{font-size:15px;font-weight:800}
+.req-meta{font-size:12px;color:var(--muted);display:flex;flex-wrap:wrap;gap:10px;margin-top:6px}
+.mediabar{display:flex;gap:6px;margin-top:10px;overflow-x:auto}
+.mediabar img,.mediabar video{width:60px;height:60px;object-fit:cover;border-radius:8px;flex-shrink:0;border:1px solid var(--line)}
+.detail-media{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.detail-media img,.detail-media video{width:100%;aspect-ratio:1;object-fit:cover;border-radius:10px;border:1px solid var(--line)}
+.mech-row{display:flex;align-items:center;gap:12px;padding:12px 0;border-top:1px solid var(--line)}
+.mech-av{width:44px;height:44px;border-radius:50%;background:var(--navy);display:flex;align-items:center;justify-content:center;font-size:20px;overflow:hidden;flex-shrink:0}
+.mech-av img{width:100%;height:100%;object-fit:cover}
+.st-dot{width:8px;height:8px;border-radius:50%;display:inline-block;margin-inline-end:5px}
+.st-available{background:var(--green)}.st-busy{background:var(--orange)}.st-repairing{background:var(--yellow)}
+.st-break{background:#3B82F6}.st-leave{background:#A855F7}.st-off{background:#6B7280}
+.status-pick{display:flex;flex-wrap:wrap;gap:7px;margin-top:8px}
+.status-chip{font-size:12px;font-weight:700;padding:7px 12px;border-radius:20px;background:var(--charcoal-3);color:var(--muted);border:1px solid var(--line)}
+.status-chip.on{background:var(--orange);color:#fff;border-color:var(--orange)}
+.sheet{position:fixed;inset:0;z-index:500;background:rgba(0,0,0,.6);display:flex;align-items:flex-end}
+.sheet-inner{background:var(--charcoal);width:100%;max-height:92%;border-radius:20px 20px 0 0;display:flex;flex-direction:column;animation:fadeIn .3s var(--ease)}
+.sheet-head{display:flex;align-items:center;justify-content:space-between;padding:16px 18px;border-bottom:1px solid var(--line);flex-shrink:0}
+
+.livemap{width:100%;height:220px;border-radius:14px;overflow:hidden;border:1px solid var(--line);background:var(--navy)}
+.leaflet-container{background:#0e1a2e;font-family:'Cairo',sans-serif}
+.mk-pin{font-size:26px;filter:drop-shadow(0 2px 4px rgba(0,0,0,.5));line-height:1}
+.track-hd{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.track-live{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:800;color:var(--green)}
+.track-live .dot{width:7px;height:7px;border-radius:50%;background:var(--green);animation:pulse 1.3s infinite}
+
+.metric-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+.metric{background:var(--charcoal-2);border:1px solid var(--line);border-radius:14px;padding:14px}
+.metric .mv{font-size:24px;font-weight:900;line-height:1}
+.metric .ml{font-size:11px;color:var(--muted);font-weight:700;margin-top:4px}
+.metric.hl{background:linear-gradient(135deg,rgba(255,106,0,.14),var(--charcoal-2));border-color:rgba(255,106,0,.32)}
+.metric.hl .mv{color:var(--orange)}
+.metric.gold{background:linear-gradient(135deg,rgba(255,194,46,.14),var(--charcoal-2));border-color:rgba(255,194,46,.32)}
+.metric.gold .mv{color:var(--yellow)}
+.bar-row{display:flex;align-items:center;gap:8px;margin-bottom:9px}
+.bar-lb{font-size:12px;width:88px;color:var(--muted);flex-shrink:0}
+.bar-track{flex:1;height:8px;background:var(--charcoal-3);border-radius:4px;overflow:hidden}
+.bar-fill{height:100%;background:linear-gradient(90deg,var(--orange),var(--orange-d));border-radius:4px;transition:width .5s var(--ease)}
+.bar-val{font-size:12px;font-weight:800;width:24px;text-align:end;flex-shrink:0}
+.day-chart{display:flex;align-items:flex-end;gap:6px;height:104px;padding-top:10px}
+.day-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;height:100%;justify-content:flex-end}
+.day-bar{width:100%;background:linear-gradient(180deg,var(--orange),var(--orange-d));border-radius:5px 5px 0 0;min-height:3px;transition:height .5s var(--ease)}
+.day-lb{font-size:9px;color:var(--muted)}
+.dev-hd{text-align:center;padding:14px;background:linear-gradient(135deg,var(--navy),var(--navy-2));border-radius:14px;margin-bottom:14px;border:1px solid rgba(255,194,46,.25)}
+
+.install-banner{position:fixed;left:12px;right:12px;bottom:16px;z-index:600;background:linear-gradient(160deg,var(--navy),var(--charcoal-2));border:1.5px solid rgba(255,106,0,.4);border-radius:16px;padding:13px 14px;display:flex;align-items:center;gap:12px;box-shadow:var(--shadow);animation:fadeIn .3s var(--ease)}
+.install-banner img{width:44px;height:44px;border-radius:11px;flex-shrink:0}
+.install-banner .ib-t{font-size:13px;font-weight:800}
+.install-banner .ib-s{font-size:11px;color:var(--muted);margin-top:1px;line-height:1.3}
+.install-banner .ib-b{background:var(--orange);color:#fff;font-size:12px;font-weight:800;padding:9px 13px;border-radius:9px;white-space:nowrap;flex-shrink:0}
+.install-banner .ib-x{background:transparent;color:var(--muted);font-size:17px;width:24px;flex-shrink:0}
+
+@keyframes shimmer{0%{background-position:-420px 0}100%{background-position:420px 0}}
+.skel{background:linear-gradient(100deg,rgba(255,255,255,.05) 30%,rgba(255,255,255,.13) 50%,rgba(255,255,255,.05) 70%);background-size:840px 100%;animation:shimmer 1.25s infinite linear;border-radius:10px}
+.skel-card{background:var(--charcoal-2);border:1px solid var(--line);border-radius:14px;padding:14px;margin-bottom:11px}
+.skel-line{height:12px;margin-bottom:9px}
+
+.rating-row{display:flex;gap:6px;justify-content:center;margin:10px 0}
+.rstar{font-size:32px;line-height:1;background:transparent;transition:transform .12s var(--spring);filter:grayscale(1) opacity(.45)}
+.rstar.on{filter:none}
+.rstar:active{transform:scale(1.25)}
+.rev-txt{font-size:13px;color:var(--text);background:rgba(255,255,255,.03);border-radius:8px;padding:8px 10px;margin-top:6px}
+.search-box{width:100%;background:rgba(255,255,255,.05);border:1.5px solid var(--line);border-radius:10px;color:var(--text);font-size:14px;padding:11px 14px;margin-bottom:12px}
+.search-box:focus{border-color:var(--orange)}
+.mini-stars{color:var(--yellow);font-size:12px;font-weight:800}
+
+.zone-sel{width:100%;background:rgba(255,255,255,.05);border:1.5px solid var(--line);border-radius:10px;color:var(--text);font-size:15px;padding:13px 14px}
+.zone-sel option{background:var(--charcoal-2);color:var(--text)}
+.pend-row{display:flex;align-items:center;gap:10px;padding:12px 0;border-top:1px solid var(--line)}
+.offline-bar{position:fixed;top:0;left:0;right:0;z-index:700;background:var(--red);color:#fff;font-size:12px;font-weight:800;text-align:center;padding:6px}
+.sw-toggle{width:44px;height:25px;border-radius:14px;background:var(--charcoal-3);border:1px solid var(--line);position:relative;transition:background .2s}
+.sw-toggle.on{background:var(--orange);border-color:var(--orange)}
+.sw-toggle .knob{position:absolute;top:2px;inset-inline-start:2px;width:19px;height:19px;border-radius:50%;background:#fff;transition:transform .2s var(--spring)}
+.sw-toggle.on .knob{transform:translateX(19px)}
+[dir="rtl"] .sw-toggle.on .knob{transform:translateX(-19px)}
+
+.chat-box{max-height:230px;overflow-y:auto;display:flex;flex-direction:column;gap:7px;padding:4px 2px;margin-bottom:10px}
+.msg{max-width:78%;padding:8px 11px;border-radius:12px;font-size:13px;line-height:1.4;word-break:break-word}
+.msg.me{align-self:flex-end;background:var(--orange);color:#fff;border-bottom-inline-end-radius:4px}
+.msg.them{align-self:flex-start;background:var(--charcoal-3);color:var(--text);border-bottom-inline-start-radius:4px}
+.msg .who{font-size:9px;opacity:.75;font-weight:800;margin-bottom:2px}
+.chat-in{display:flex;gap:7px}
+.chat-in input{flex:1;background:rgba(255,255,255,.05);border:1.5px solid var(--line);border-radius:10px;color:var(--text);font-size:14px;padding:11px 12px}
+.chat-in input:focus{border-color:var(--orange)}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.3.1/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.3.1/umd/react-dom.production.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script>
+const {useState,useEffect,useRef,useCallback} = React;
+const SUPA_URL = 'https://orbpucthawweysjedtpc.supabase.co';
+const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9yYnB1Y3RoYXd3ZXlzamVkdHBjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI3NjM4NDAsImV4cCI6MjA5ODMzOTg0MH0.uvHsg2a0L0Nyqp5NLus-p6HgQYBuy_yVZJ8dJ0L0RXQ';
+const sb = (typeof supabase !== 'undefined' && supabase.createClient) ? supabase.createClient(SUPA_URL, SUPA_KEY) : null;
+const AVATAR_BUCKET = 'avatars';
+const DEV_PHONE = '33445125';
+const DEV_PASS  = 'Allah@202211122';
+const WA_MANAGER='22234412421'; // BRCC management WhatsApp
+// ── Web Push (VAPID) ──────────────────────────────────────────
+const VAPID_PUBLIC='BALtaslMeBLsaT12AZ-U_t_4e51nwovbS23xdIA3p1FoeLRgb57vuSNcZWl63CfxF0_STv9nsDaN-OgPlRMNO6U';
+function urlB64ToUint8(b64){const pad='='.repeat((4-b64.length%4)%4);const s=(b64+pad).replace(/-/g,'+').replace(/_/g,'/');
+  const raw=atob(s);const arr=new Uint8Array(raw.length);for(let i=0;i<raw.length;i++)arr[i]=raw.charCodeAt(i);return arr;}
+async function enablePush(user){
+  try{
+    if(!('serviceWorker' in navigator)||!('PushManager' in window))return {ok:false,reason:'unsupported'};
+    const perm=await Notification.requestPermission();
+    if(perm!=='granted')return {ok:false,reason:'denied'};
+    const reg=await navigator.serviceWorker.ready;
+    let sub=await reg.pushManager.getSubscription();
+    if(!sub) sub=await reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:urlB64ToUint8(VAPID_PUBLIC)});
+    const j=sub.toJSON();
+    if(sb) await sb.from('push_subs').upsert({user_id:user.id,endpoint:j.endpoint,p256dh:j.keys.p256dh,auth:j.keys.auth,role:user.role},{onConflict:'endpoint'});
+    return {ok:true};
+  }catch(e){console.error('push',e);return {ok:false,reason:e.message};}
+}
+async function pushNotify(userId,title,body){
+  try{ if(!sb)return; await sb.functions.invoke('send-push',{body:{user_id:userId,title,body}}); }catch(e){console.error('pushNotify',e);}
+}
+const ZONES=['تفرغ زينة','عرفات','دار النعيم','السبخة','الميناء','الرياض','توجونين','كصر','لكصر','خارج نواكشوط'];
+// Accessibility: larger text
+let TEXTSCALE=(function(){try{return localStorage.getItem('brcc_textscale')==='1';}catch(e){return false;}})();
+function applyTextScale(on){TEXTSCALE=on;try{localStorage.setItem('brcc_textscale',on?'1':'0');}catch(e){}
+  try{document.documentElement.style.fontSize=on?'118%':'';}catch(e){}}
+applyTextScale(TEXTSCALE);
+// Offline queue
+function queueRequest(p){try{localStorage.setItem('brcc_queued',JSON.stringify(p));}catch(e){}}
+function getQueued(){try{return JSON.parse(localStorage.getItem('brcc_queued')||'null');}catch(e){return null;}}
+function clearQueued(){try{localStorage.removeItem('brcc_queued');}catch(e){}}
+function waAlert(req){
+  try{
+    const pm=(PAY_METHODS.find(m=>m.id===req.payment_method)||{}).name||req.payment_method||'-';
+    const gps=(req.latitude&&req.longitude)?('https://www.google.com/maps?q='+req.latitude+','+req.longitude):(req.location||'-');
+    const media=Array.isArray(req.media)?req.media:[];
+    const lines=['🆘 *طلب نجدة جديد — AL Najda Auto BRCC*','','👤 '+(req.client_name||'-'),'📱 '+(req.client_phone||'-'),
+      '🔧 '+(req.tier==='premium'?'خدمة مميّزة':'خدمة عادية'),'📍 '+gps,'💳 '+pm,
+      (media.length?('📷 '+media.length+' ملف مرفق'):''),(req.details?('📝 '+req.details):''),'','⚡ افتح لوحة الإدارة لتعيين ميكانيكي'];
+    const msg=lines.filter(Boolean).join('\n');
+    window.open('https://wa.me/'+WA_MANAGER+'?text='+encodeURIComponent(msg),'_blank');
+  }catch(e){console.error('wa',e);}
+}
+function waMechanic(req,mech){
+  try{
+    if(!mech||!mech.phone)return;
+    const to=String(mech.phone).replace(/[^0-9]/g,'');
+    const num=to.length<=8?('222'+to):to;
+    const gps=(req.latitude&&req.longitude)?('https://www.google.com/maps?q='+req.latitude+','+req.longitude):(req.location||'-');
+    const lines=['📣 *مهمة جديدة — AL Najda Auto BRCC*','','👤 العميل: '+(req.client_name||'-'),'📱 '+(req.client_phone||'-'),
+      '🔧 '+(req.tier==='premium'?'خدمة مميّزة ⚡':'خدمة عادية'),(req.zone?('🗺️ '+req.zone):''),'📍 '+gps,
+      (req.details?('📝 '+req.details):''),'','⚠️ تأكّد من الدفع واتصل بالعميل قبل التحرّك.'];
+    window.open('https://wa.me/'+num+'?text='+encodeURIComponent(lines.filter(Boolean).join('\n')),'_blank');
+  }catch(e){console.error('waMech',e);}
+}
+
+// ── i18n (Arabic default; FR/EN via lookup) ───────────────────
+const TRANSLATIONS = {
+ fr:{
+  'مساعدة فورية لإصلاح سيارتك':'Assistance immédiate pour votre voiture',
+  'خدمة إصلاح ونجدة السيارات على مدار الساعة':'Réparation et dépannage auto 24h/24',
+  'دخول':'Entrer','اختر نوع الحساب':'Choisissez votre profil',
+  'الإدارة':'Administration','الميكانيكي':'Mécanicien','العميل':'Client',
+  'لوحة الإدارة BRCC':'Espace BRCC','صاحب السيارة':'Propriétaire du véhicule',
+  'تسجيل الدخول':'Connexion','إنشاء حساب':'Créer un compte','رقم الهاتف':'Numéro de téléphone',
+  'كلمة المرور':'Mot de passe','الاسم الكامل':'Nom complet','صورة الحساب':'Photo de profil',
+  'اختر صورة':'Choisir une photo','تسجيل':"S'inscrire",
+  'ليس لديك حساب؟ أنشئ حساباً':"Pas de compte ? Créez-en un",
+  'لديك حساب؟ سجّل الدخول':'Déjà un compte ? Connectez-vous',
+  'تم إنشاء الحساب بنجاح':'Compte créé avec succès','رقم الهاتف مسجّل مسبقاً':'Numéro déjà enregistré',
+  'بيانات الدخول غير صحيحة':'Identifiants incorrects','جارٍ...':'En cours...',
+  'أكمل جميع الحقول':'Remplissez tous les champs','كلمة المرور 8 أحرف على الأقل':'Mot de passe : 8 caractères min.',
+  'حسابات العملاء تُنشأ من قبل إدارة BRCC':'Les comptes clients sont créés par BRCC',
+  'الطلبات':'Demandes','الميكانيكيون':'Mécaniciens','مهامي':'Mes tâches','السجل':'Historique',
+  'الرئيسية':'Accueil','حسابي':'Mon compte','لوحة التحكم':'Tableau de bord',
+  'قيد الإنشاء':'En construction','هذه الصفحة ستكون جاهزة في المرحلة القادمة':'Cette section arrive dans la prochaine étape',
+  'إنشاء حساب عميل':'Créer un compte client','إنشاء الحساب':'Créer le compte','تم إنشاء حساب العميل':'Compte client créé',
+  'الإعدادات':'Paramètres','معلومات الحساب':'Informations du compte','تغيير الصورة':'Changer la photo',
+  'تغيير كلمة المرور':'Changer le mot de passe','إشعارات الطلبات':'Notifications des demandes',
+  'تسجيل الخروج':'Se déconnecter','تواصل معنا':'Contactez-nous',
+  'لوحة المطوّر':'Espace développeur','دخول المطوّر':'Accès développeur',
+  'مرحباً بك عميلنا الكريم':'Bienvenue, cher client','نحن هنا على مدار الساعة لإصلاح سيارتك':'Disponibles 24h/24 pour réparer votre voiture',
+  'جميع الأعطال الميكانيكية لسيارتك':'Toutes les pannes mécaniques de votre voiture','اطلب ميكانيكي الآن':'Demander un mécanicien',
+  'خدماتنا':'Nos services','متاح':'Disponible','مشغول':'Occupé','في إجازة':'En congé','استراحة':'En pause',
+  'يصلّح الآن':'En intervention','خارج الدوام':'Hors service','الحفظ':'Enregistrer','تم الحفظ':'Enregistré'
+ },
+ en:{
+  'مساعدة فورية لإصلاح سيارتك':'Instant help to fix your car',
+  'خدمة إصلاح ونجدة السيارات على مدار الساعة':'24/7 car repair & roadside rescue',
+  'دخول':'Enter','اختر نوع الحساب':'Choose your profile',
+  'الإدارة':'Administration','الميكانيكي':'Mechanic','العميل':'Client',
+  'لوحة الإدارة BRCC':'BRCC Admin','صاحب السيارة':'Vehicle owner',
+  'تسجيل الدخول':'Sign In','إنشاء حساب':'Create account','رقم الهاتف':'Phone number',
+  'كلمة المرور':'Password','الاسم الكامل':'Full name','صورة الحساب':'Profile photo',
+  'اختر صورة':'Choose a photo','تسجيل':'Sign Up',
+  'ليس لديك حساب؟ أنشئ حساباً':"No account? Create one",
+  'لديك حساب؟ سجّل الدخول':'Have an account? Sign in',
+  'تم إنشاء الحساب بنجاح':'Account created successfully','رقم الهاتف مسجّل مسبقاً':'Phone already registered',
+  'بيانات الدخول غير صحيحة':'Invalid credentials','جارٍ...':'Working...',
+  'أكمل جميع الحقول':'Fill in all fields','كلمة المرور 8 أحرف على الأقل':'Password: 8 characters min.',
+  'حسابات العملاء تُنشأ من قبل إدارة BRCC':'Client accounts are created by BRCC',
+  'الطلبات':'Requests','الميكانيكيون':'Mechanics','مهامي':'My Tasks','السجل':'History',
+  'الرئيسية':'Home','حسابي':'My Account','لوحة التحكم':'Dashboard',
+  'قيد الإنشاء':'Coming soon','هذه الصفحة ستكون جاهزة في المرحلة القادمة':'This section arrives in the next phase',
+  'إنشاء حساب عميل':'Create client account','إنشاء الحساب':'Create account','تم إنشاء حساب العميل':'Client account created',
+  'الإعدادات':'Settings','معلومات الحساب':'Account info','تغيير الصورة':'Change photo',
+  'تغيير كلمة المرور':'Change password','إشعارات الطلبات':'Request notifications',
+  'تسجيل الخروج':'Log Out','تواصل معنا':'Contact us',
+  'لوحة المطوّر':'Developer panel','دخول المطوّر':'Developer access',
+  'مرحباً بك عميلنا الكريم':'Welcome, valued client','نحن هنا على مدار الساعة لإصلاح سيارتك':"We're here 24/7 to repair your car",
+  'جميع الأعطال الميكانيكية لسيارتك':'All mechanical faults of your car','اطلب ميكانيكي الآن':'Request a mechanic now',
+  'خدماتنا':'Our services','متاح':'Available','مشغول':'Busy','في إجازة':'On leave','استراحة':'On break',
+  'يصلّح الآن':'On a job','خارج الدوام':'Off duty','الحفظ':'Save','تم الحفظ':'Saved'
+ }
+};
+
+Object.assign(TRANSLATIONS.fr, {"اختر مستوى الخدمة": "Choisissez le niveau de service", "الخدمة العادية": "Service normal", "الميكانيكي سيأتيك بعد التأكيد": "Le mécanicien arrive après confirmation", "الخدمة المميزة": "Service Premium", "سريعة جداً — أسرع وصول ممكن": "Très rapide — arrivée la plus rapide", "بيانات الطلب": "Détails de la demande", "الموقع": "Localisation", "تحديد موقعي": "Me localiser", "تم تحديد الموقع": "Position détectée", "أدخل موقعك أو اضغط للتحديد": "Saisissez ou détectez votre position", "تفاصيل العطل": "Détails de la panne", "اكتب وصف المشكلة": "Décrivez le problème", "الصور والفيديوهات": "Photos et vidéos", "أضف صوراً": "Ajouter des photos", "أضف فيديو": "Ajouter une vidéo", "حتى 10 صور و5 فيديوهات قصيرة": "Jusqu’à 10 photos et 5 vidéos courtes", "التالي": "Suivant", "رجوع": "Retour", "وسيلة الدفع": "Moyen de paiement", "اختر وسيلة الدفع — تأكيد فقط": "Choisissez le moyen — confirmation seulement", "الدفع بعد الإصلاح": "Paiement après réparation", "بنكيلي": "Bankily", "سداد": "Sedad", "مصرفي": "Masrivi", "نقداً": "Espèces", "إرسال الطلب للميكانيكي": "Envoyer la demande", "جارٍ الإرسال...": "Envoi...", "⚠️ حدد موقعك": "⚠️ Indiquez votre position", "⚠️ اختر وسيلة الدفع": "⚠️ Choisissez un moyen de paiement", "✅ تم إرسال طلبك": "✅ Demande envoyée", "الوضعية الحالية": "Statut actuel", "لا يوجد طلب نشط": "Aucune demande active", "ستظهر هنا حالة طلبك": "Le statut de votre demande apparaîtra ici", "قيد الانتظار": "En attente", "الميكانيكي قادم": "Mécanicien en route", "وصل الميكانيكي": "Mécanicien arrivé", "تم إنجاز العمل": "Travail terminé", "الميكانيكي المعيّن": "Mécanicien assigné", "اتصل": "Appeler", "رفع وصل الدفع": "Téléverser le reçu", "جارٍ الرفع...": "Téléversement...", "تم رفع الوصل": "Reçu envoyé", "بانتظار تأكيد الإدارة": "En attente de confirmation", "✅ تم تأكيد الدفع": "✅ Paiement confirmé", "⚠️ الفيديو أطول من دقيقة": "⚠️ Vidéo de plus d’une minute", "⚠️ حد أقصى 10 صور": "⚠️ 10 photos maximum", "⚠️ حد أقصى 5 فيديوهات": "⚠️ 5 vidéos maximum", "طلب مساعدة": "Demande d’aide"});
+Object.assign(TRANSLATIONS.en, {"اختر مستوى الخدمة": "Choose service level", "الخدمة العادية": "Standard service", "الميكانيكي سيأتيك بعد التأكيد": "A mechanic comes after confirmation", "الخدمة المميزة": "Premium service", "سريعة جداً — أسرع وصول ممكن": "Very fast — quickest arrival", "بيانات الطلب": "Request details", "الموقع": "Location", "تحديد موقعي": "Locate me", "تم تحديد الموقع": "Location detected", "أدخل موقعك أو اضغط للتحديد": "Enter or detect your location", "تفاصيل العطل": "Fault details", "اكتب وصف المشكلة": "Describe the problem", "الصور والفيديوهات": "Photos & videos", "أضف صوراً": "Add photos", "أضف فيديو": "Add video", "حتى 10 صور و5 فيديوهات قصيرة": "Up to 10 photos & 5 short videos", "التالي": "Next", "رجوع": "Back", "وسيلة الدفع": "Payment method", "اختر وسيلة الدفع — تأكيد فقط": "Choose method — confirmation only", "الدفع بعد الإصلاح": "Payment after repair", "بنكيلي": "Bankily", "سداد": "Sedad", "مصرفي": "Masrivi", "نقداً": "Cash", "إرسال الطلب للميكانيكي": "Send request", "جارٍ الإرسال...": "Sending...", "⚠️ حدد موقعك": "⚠️ Set your location", "⚠️ اختر وسيلة الدفع": "⚠️ Choose a payment method", "✅ تم إرسال طلبك": "✅ Request sent", "الوضعية الحالية": "Current status", "لا يوجد طلب نشط": "No active request", "ستظهر هنا حالة طلبك": "Your request status will appear here", "قيد الانتظار": "Pending", "الميكانيكي قادم": "Mechanic on the way", "وصل الميكانيكي": "Mechanic arrived", "تم إنجاز العمل": "Work completed", "الميكانيكي المعيّن": "Assigned mechanic", "اتصل": "Call", "رفع وصل الدفع": "Upload payment receipt", "جارٍ الرفع...": "Uploading...", "تم رفع الوصل": "Receipt uploaded", "بانتظار تأكيد الإدارة": "Awaiting confirmation", "✅ تم تأكيد الدفع": "✅ Payment confirmed", "⚠️ الفيديو أطول من دقيقة": "⚠️ Video longer than 1 minute", "⚠️ حد أقصى 10 صور": "⚠️ 10 photos max", "⚠️ حد أقصى 5 فيديوهات": "⚠️ 5 videos max", "طلب مساعدة": "Help request"});
+
+Object.assign(TRANSLATIONS.fr, {"طلبات جديدة": "Nouvelles", "قيد التنفيذ": "En cours", "مكتملة": "Terminées", "لا توجد طلبات": "Aucune demande", "لا توجد مهام": "Aucune tâche", "تفاصيل الطلب": "Détails de la demande", "رقم الطلب": "N° demande", "تعيين ميكانيكي": "Assigner un mécanicien", "اختر ميكانيكي": "Choisir un mécanicien", "تم التعيين": "Assigné", "بانتظار التعيين": "À assigner", "حالتي": "Mon statut", "أنا في الطريق": "Je suis en route", "وصلت": "Je suis arrivé", "إنهاء المهمة": "Terminer la tâche", "مراجعة وصل الدفع": "Vérifier le reçu", "تأكيد الدفع": "Confirmer le paiement", "تم تأكيد الدفع بنجاح": "Paiement confirmé", "اتصل بالعميل": "Appeler le client", "عرض على الخريطة": "Voir sur la carte", "وسيلة الدفع المختارة": "Moyen de paiement choisi", "صور وفيديوهات الطلب": "Photos & vidéos", "لا توجد وسائط": "Aucun média", "طلب جديد وصل": "Nouvelle demande reçue", "مهمة جديدة لك": "Nouvelle tâche pour vous", "لا يوجد ميكانيكيون": "Aucun mécanicien", "العميل": "Client", "التفاصيل": "Détails", "أُرسل": "Envoyé", "تم إغلاق الطلب": "Demande clôturée", "إغلاق": "Fermer"});
+Object.assign(TRANSLATIONS.en, {"طلبات جديدة": "New", "قيد التنفيذ": "Ongoing", "مكتملة": "Completed", "لا توجد طلبات": "No requests", "لا توجد مهام": "No tasks", "تفاصيل الطلب": "Request details", "رقم الطلب": "Request", "تعيين ميكانيكي": "Assign mechanic", "اختر ميكانيكي": "Choose a mechanic", "تم التعيين": "Assigned", "بانتظار التعيين": "Awaiting assignment", "حالتي": "My status", "أنا في الطريق": "On my way", "وصلت": "I arrived", "إنهاء المهمة": "Complete task", "مراجعة وصل الدفع": "Review receipt", "تأكيد الدفع": "Confirm payment", "تم تأكيد الدفع بنجاح": "Payment confirmed", "اتصل بالعميل": "Call client", "عرض على الخريطة": "View on map", "وسيلة الدفع المختارة": "Chosen payment method", "صور وفيديوهات الطلب": "Request media", "لا توجد وسائط": "No media", "طلب جديد وصل": "New request received", "مهمة جديدة لك": "New task for you", "لا يوجد ميكانيكيون": "No mechanics", "العميل": "Client", "التفاصيل": "Details", "أُرسل": "Sent", "تم إغلاق الطلب": "Request closed", "إغلاق": "Close"});
+
+Object.assign(TRANSLATIONS.fr, {"الميكانيكي في الطريق إليك": "Mécanicien en route vers vous", "موقعك": "Votre position", "الميكانيكي": "Mécanicien", "بانتظار موقع الميكانيكي": "En attente de la position du mécanicien", "يبعد": "À", "كم": "km", "تتبّع مباشر": "Suivi en direct", "شارك موقعك للعميل": "Partagez votre position", "جارٍ مشاركة موقعك": "Partage de votre position"});
+Object.assign(TRANSLATIONS.en, {"الميكانيكي في الطريق إليك": "Mechanic on the way to you", "موقعك": "Your location", "الميكانيكي": "Mechanic", "بانتظار موقع الميكانيكي": "Waiting for mechanic location", "يبعد": "Distance", "كم": "km", "تتبّع مباشر": "Live tracking", "شارك موقعك للعميل": "Share your location", "جارٍ مشاركة موقعك": "Sharing your location"});
+
+Object.assign(TRANSLATIONS.fr, {"نظرة عامة": "Vue d’ensemble", "إجمالي الطلبات": "Total demandes", "العملاء": "Clients", "المداخيل": "Revenus", "المعاملات المدفوعة": "Transactions payées", "حسب المستوى": "Par niveau", "وسائل الدفع": "Moyens de paiement", "أداء الميكانيكيين": "Performance des mécaniciens", "مهمة": "tâches", "الطلبات آخر 7 أيام": "Demandes — 7 derniers jours", "المبلغ المستلم (اختياري)": "Montant reçu (optionnel)", "أوقية": "MRU", "لا توجد بيانات بعد": "Aucune donnée pour le moment", "جديدة": "Nouvelles", "عادية": "Standard", "مميزة": "Premium"});
+Object.assign(TRANSLATIONS.en, {"نظرة عامة": "Overview", "إجمالي الطلبات": "Total requests", "العملاء": "Clients", "المداخيل": "Revenue", "المعاملات المدفوعة": "Paid transactions", "حسب المستوى": "By tier", "وسائل الدفع": "Payment methods", "أداء الميكانيكيين": "Mechanics performance", "مهمة": "tasks", "الطلبات آخر 7 أيام": "Requests — last 7 days", "المبلغ المستلم (اختياري)": "Amount received (optional)", "أوقية": "MRU", "لا توجد بيانات بعد": "No data yet", "جديدة": "New", "عادية": "Standard", "مميزة": "Premium"});
+
+Object.assign(TRANSLATIONS.fr, {"ثبّت التطبيق": "Installer l’application", "أضِفه إلى شاشتك الرئيسية للوصول السريع": "Ajoutez-le à votre écran d’accueil", "📲 تثبيت": "📲 Installer", "لاحقاً": "Plus tard", "للتثبيت: اضغط المشاركة ⬆️ ثم «أضف إلى الشاشة الرئيسية»": "Partager ⬆️ puis « Sur l’écran d’accueil »"});
+Object.assign(TRANSLATIONS.en, {"ثبّت التطبيق": "Install app", "أضِفه إلى شاشتك الرئيسية للوصول السريع": "Add it to your home screen", "📲 تثبيت": "📲 Install", "لاحقاً": "Later", "للتثبيت: اضغط المشاركة ⬆️ ثم «أضف إلى الشاشة الرئيسية»": "Tap Share ⬆️ then \"Add to Home Screen\""});
+
+Object.assign(TRANSLATIONS.fr, {"كيف كانت الخدمة؟": "Comment était le service ?", "قيّم الخدمة": "Évaluez le service", "أضف تعليقاً (اختياري)": "Ajouter un commentaire (optionnel)", "إرسال التقييم": "Envoyer l’évaluation", "شكراً لتقييمك": "Merci pour votre évaluation", "التقييم": "Évaluation", "أبلغ الإدارة عبر واتساب": "Notifier la direction via WhatsApp", "سجلّ طلباتي": "Mes demandes", "لا توجد طلبات سابقة": "Aucune demande précédente", "بحث بالاسم أو الرقم": "Rechercher par nom ou numéro", "اليوم": "Aujourd’hui", "هذا الأسبوع": "Cette semaine", "هذا الشهر": "Ce mois", "متوسط المهمة": "Moyenne / mission", "متوسط التقييم": "Note moyenne", "الوصول خلال": "Arrivée dans", "دقيقة": "min", "طلب مساعدة": "Demande d’aide"});
+Object.assign(TRANSLATIONS.en, {"كيف كانت الخدمة؟": "How was the service?", "قيّم الخدمة": "Rate the service", "أضف تعليقاً (اختياري)": "Add a comment (optional)", "إرسال التقييم": "Submit rating", "شكراً لتقييمك": "Thanks for your rating", "التقييم": "Rating", "أبلغ الإدارة عبر واتساب": "Notify management via WhatsApp", "سجلّ طلباتي": "My requests", "لا توجد طلبات سابقة": "No past requests", "بحث بالاسم أو الرقم": "Search by name or number", "اليوم": "Today", "هذا الأسبوع": "This week", "هذا الشهر": "This month", "متوسط المهمة": "Avg / job", "متوسط التقييم": "Avg rating", "الوصول خلال": "Arriving in", "دقيقة": "min", "طلب مساعدة": "Help request"});
+
+Object.assign(TRANSLATIONS.fr, {"حسابك بانتظار موافقة الإدارة": "Compte en attente d’approbation", "تم إرسال طلبك — بانتظار موافقة الإدارة": "Demande envoyée — en attente d’approbation", "طلبات الحسابات": "Demandes de comptes", "موافقة": "Approuver", "رفض": "Rejeter", "تمت الموافقة": "Approuvé", "تم الرفض": "Rejeté", "لا توجد طلبات حسابات": "Aucune demande de compte", "المنطقة": "Zone", "اختر المنطقة": "Choisissez la zone", "الأقرب": "Le plus proche", "مقترح": "Suggéré", "إمكانية الوصول": "Accessibilité", "نص كبير": "Texte agrandi", "لا يوجد اتصال — سيُرسل الطلب تلقائياً": "Hors ligne — la demande sera envoyée automatiquement", "تم إرسال طلبك المؤجّل": "Votre demande en attente a été envoyée", "أنشئ حساباً كعميل": "Créer un compte client"});
+Object.assign(TRANSLATIONS.en, {"حسابك بانتظار موافقة الإدارة": "Account awaiting approval", "تم إرسال طلبك — بانتظار موافقة الإدارة": "Request sent — awaiting approval", "طلبات الحسابات": "Account requests", "موافقة": "Approve", "رفض": "Reject", "تمت الموافقة": "Approved", "تم الرفض": "Rejected", "لا توجد طلبات حسابات": "No account requests", "المنطقة": "Zone", "اختر المنطقة": "Choose zone", "الأقرب": "Nearest", "مقترح": "Suggested", "إمكانية الوصول": "Accessibility", "نص كبير": "Larger text", "لا يوجد اتصال — سيُرسل الطلب تلقائياً": "Offline — request will send automatically", "تم إرسال طلبك المؤجّل": "Your queued request was sent", "أنشئ حساباً كعميل": "Create a client account"});
+
+Object.assign(TRANSLATIONS.fr, {"حسابات العملاء تحتاج موافقة الإدارة": "Les comptes clients nécessitent l’approbation"});
+Object.assign(TRANSLATIONS.en, {"حسابات العملاء تحتاج موافقة الإدارة": "Client accounts need admin approval"});
+
+Object.assign(TRANSLATIONS.fr, {"تصدير التقارير": "Exporter les rapports", "تصدير Excel": "Exporter Excel", "تصدير PDF": "Exporter PDF", "تقرير الأداء والمداخيل": "Rapport de performance et revenus", "تم التصدير": "Exporté", "التاريخ": "Date", "الحالة": "Statut", "المبلغ": "Montant"});
+Object.assign(TRANSLATIONS.en, {"تصدير التقارير": "Export reports", "تصدير Excel": "Export Excel", "تصدير PDF": "Export PDF", "تقرير الأداء والمداخيل": "Performance & revenue report", "تم التصدير": "Exported", "التاريخ": "Date", "الحالة": "Status", "المبلغ": "Amount"});
+
+Object.assign(TRANSLATIONS.fr, {"المحادثة": "Discussion", "اكتب رسالة...": "Écrire un message...", "لا توجد رسائل بعد": "Aucun message", "إرسال": "Envoyer"});
+Object.assign(TRANSLATIONS.en, {"المحادثة": "Chat", "اكتب رسالة...": "Type a message...", "لا توجد رسائل بعد": "No messages yet", "إرسال": "Send"});
+
+Object.assign(TRANSLATIONS.fr, {"إبلاغ الميكانيكي عبر واتساب": "Notifier le mécanicien via WhatsApp", "تفعيل الإشعارات": "Activer les notifications", "الإشعارات مفعّلة": "Notifications activées", "تم تفعيل الإشعارات": "Notifications activées", "تم رفض الإشعارات": "Notifications refusées"});
+Object.assign(TRANSLATIONS.en, {"إبلاغ الميكانيكي عبر واتساب": "Notify mechanic via WhatsApp", "تفعيل الإشعارات": "Enable notifications", "الإشعارات مفعّلة": "Notifications enabled", "تم تفعيل الإشعارات": "Notifications enabled", "تم رفض الإشعارات": "Notifications denied"});
+let LANG=(function(){try{return localStorage.getItem('brcc_lang')||'ar';}catch(e){return 'ar';}})();
+function tr(s){if(s==null)return s;if(LANG==='ar')return s;const d=TRANSLATIONS[LANG];return (d&&d[s]!==undefined)?d[s]:s;}
+function applyLang(l){LANG=l;try{localStorage.setItem('brcc_lang',l);}catch(e){}try{document.documentElement.lang=l;document.documentElement.dir=(l==='ar'?'rtl':'ltr');}catch(e){}}
+applyLang(LANG);
+let deferredPrompt=null;
+window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferredPrompt=e;window.dispatchEvent(new Event('brcc-installable'));});
+if('serviceWorker' in navigator){window.addEventListener('load',()=>{navigator.serviceWorker.register('sw.js').catch(()=>{});});}
+
+// ── helpers: hash, haptic, session, upload ────────────────────
+function haptic(p){try{if(navigator.vibrate)navigator.vibrate(p);}catch(e){}}
+function randSalt(){const a=new Uint8Array(16);crypto.getRandomValues(a);return Array.from(a).map(b=>b.toString(16).padStart(2,'0')).join('');}
+async function hashPass(pw,salt){
+  const data=new TextEncoder().encode(salt+':'+pw);
+  const buf=await crypto.subtle.digest('SHA-256',data);
+  return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
+}
+function saveSession(u){try{localStorage.setItem('brcc_session',JSON.stringify({id:u.id,role:u.role}));}catch(e){}}
+function clearSession(){try{localStorage.removeItem('brcc_session');}catch(e){}}
+function loadSession(){try{return JSON.parse(localStorage.getItem('brcc_session')||'null');}catch(e){return null;}}
+async function uploadAvatar(file){
+  const ext=(file.name.split('.').pop()||'jpg').toLowerCase().replace(/[^a-z0-9]/g,'')||'jpg';
+  const path='av_'+Date.now()+'_'+Math.random().toString(36).slice(2,7)+'.'+ext;
+  const up=await sb.storage.from(AVATAR_BUCKET).upload(path,file,{upsert:true,contentType:file.type||'image/jpeg'});
+  if(up.error)throw up.error;
+  return sb.storage.from(AVATAR_BUCKET).getPublicUrl(path).data.publicUrl;
+}
+const BANK_LOGOS = {"bankily": "data:image/png;base64,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", "masrivi": "data:image/png;base64,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", "sedad": "data:image/png;base64,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", "bci": "data:image/png;base64,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"};
+const PAY_METHODS=[
+ {id:'bankily',name:'بنكيلي',logo:BANK_LOGOS.bankily},
+ {id:'sedad',name:'سداد',logo:BANK_LOGOS.sedad},
+ {id:'masrivi',name:'مصرفي',logo:BANK_LOGOS.masrivi},
+ {id:'bcipay',name:'BCI Pay',logo:BANK_LOGOS.bci},
+ {id:'cash',name:'نقداً',logo:null,icon:'💵'},
+];
+const payMethod=id=>PAY_METHODS.find(m=>m.id===id)||null;
+const MEDIA_BUCKET='media';
+async function uploadMedia(file){
+  const ext=(file.name.split('.').pop()||'bin').toLowerCase().replace(/[^a-z0-9]/g,'')||'bin';
+  const path='m_'+Date.now()+'_'+Math.random().toString(36).slice(2,7)+'.'+ext;
+  const up=await sb.storage.from(MEDIA_BUCKET).upload(path,file,{upsert:true,contentType:file.type||'application/octet-stream'});
+  if(up.error)throw up.error;
+  return sb.storage.from(MEDIA_BUCKET).getPublicUrl(path).data.publicUrl;
+}
+function videoDuration(file){return new Promise(res=>{try{const v=document.createElement('video');v.preload='metadata';v.onloadedmetadata=()=>{const d=v.duration;URL.revokeObjectURL(v.src);res(d);};v.onerror=()=>res(999);v.src=URL.createObjectURL(file);}catch(e){res(999);}});}
+
+// ── LangSwitcher ──────────────────────────────────────────────
+function LangSwitcher({lang,onLang}){
+  return React.createElement('div',{className:'lang'},
+    [['ar','ع'],['fr','FR'],['en','EN']].map(([c,l])=>
+      React.createElement('button',{key:c,className:lang===c?'on':'',onClick:()=>onLang(c)},l)));
+}
+// ── Toast ─────────────────────────────────────────────────────
+function useToast(){const [m,setM]=useState('');const show=useCallback((t)=>{setM(t);setTimeout(()=>setM(''),2600);},[]);return [m,show];}
+function Toast({msg}){if(!msg)return null;
+  return React.createElement('div',{style:{position:'fixed',bottom:90,left:'50%',transform:'translateX(-50%)',zIndex:600,
+    background:'var(--charcoal-3)',border:'1px solid var(--line)',color:'var(--text)',padding:'12px 18px',borderRadius:12,
+    fontSize:14,fontWeight:700,boxShadow:'var(--shadow)',maxWidth:'86%',textAlign:'center'},className:'fade-in'},msg);}
+// ── Splash ────────────────────────────────────────────────────
+function Splash(){
+  return React.createElement('div',{style:{flex:1,display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',gap:16,background:'var(--charcoal)'}},
+    React.createElement('img',{src:'najda-logo-icon.svg',style:{width:110,height:110,animation:'pop .6s var(--spring)'}}),
+    React.createElement('div',{style:{fontSize:20,fontWeight:900,letterSpacing:1}},'AL NAJDA AUTO'),
+    React.createElement('div',{style:{fontSize:12,color:'var(--yellow)',fontWeight:700,letterSpacing:3}},'BRCC'),
+    React.createElement('div',{className:'loader',style:{marginTop:8}}));
+}
+// ── Landing ───────────────────────────────────────────────────
+function Landing({onEnter,onDev,lang,onLang}){
+  return React.createElement('div',{className:'app fade-in'},
+    React.createElement('div',{className:'topbar'},
+      React.createElement('div',{className:'topbar-brand'},
+        React.createElement('img',{src:'najda-logo-icon.svg'}),
+        React.createElement('div',null,
+          React.createElement('div',{className:'tt'},'AL Najda Auto'),
+          React.createElement('div',{className:'ts'},'BRCC'))),
+      React.createElement(LangSwitcher,{lang,onLang})),
+    React.createElement('div',{className:'scroll'},
+      React.createElement('div',{style:{position:'relative',height:230,overflow:'hidden'}},
+        React.createElement('img',{src:'najda-hero-1.jpg',style:{width:'100%',height:'100%',objectFit:'cover'}}),
+        React.createElement('div',{style:{position:'absolute',inset:0,background:'linear-gradient(180deg,rgba(20,23,28,.35),rgba(20,23,28,.95))'}}),
+        React.createElement('div',{style:{position:'absolute',bottom:16,insetInlineStart:18,insetInlineEnd:18}},
+          React.createElement('div',{style:{fontSize:23,fontWeight:900,lineHeight:1.25}},tr('مساعدة فورية لإصلاح سيارتك')),
+          React.createElement('div',{style:{fontSize:13,color:'var(--muted)',marginTop:6}},tr('خدمة إصلاح ونجدة السيارات على مدار الساعة')))),
+      React.createElement('div',{className:'pad'},
+        React.createElement('div',{style:{display:'grid',gridTemplateColumns:'1fr 1fr',gap:10,marginBottom:18}},
+          React.createElement('img',{src:'najda-hero-2.jpg',style:{width:'100%',height:110,objectFit:'cover',borderRadius:12,border:'1px solid var(--line)'}}),
+          React.createElement('div',{style:{borderRadius:12,border:'1px solid var(--line)',background:'var(--navy)',display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',gap:6,padding:10}},
+            React.createElement('img',{src:'najda-logo-icon.svg',style:{width:48,height:48}}),
+            React.createElement('div',{style:{fontSize:11,color:'var(--yellow)',fontWeight:800,letterSpacing:1}},'BRCC AUTO'))),
+        React.createElement('button',{className:'btn btn-primary',onClick:onEnter,style:{fontSize:16}},tr('دخول')+' →'),
+        React.createElement('img',{src:'najda-landing-bottom.svg',alt:'BRCC AUTO',style:{width:'100%',marginTop:18,borderRadius:16,display:'block'}}),
+        React.createElement('div',{onClick:onDev,style:{textAlign:'center',marginTop:22,paddingTop:14,borderTop:'1px solid var(--line)',cursor:'pointer'}},
+          React.createElement('div',{style:{fontSize:10,color:'var(--muted)'}},'Powered by'),
+          React.createElement('div',{style:{fontSize:11,color:'var(--yellow)',fontWeight:700}},'A Planet T&L SUARL © 2026')))));
+}
+// ── Role Gate ─────────────────────────────────────────────────
+function RoleGate({onPick,onBack}){
+  const roles=[['admin','لوحة الإدارة BRCC','ti'],['mechanic','الميكانيكي','me'],['client','صاحب السيارة','cl']];
+  const icon={admin:'🏢',mechanic:'🔧',client:'🚗'};
+  return React.createElement('div',{className:'app fade-in'},
+    React.createElement('div',{className:'topbar'},
+      React.createElement('button',{className:'btn-sm btn-ghost',onClick:onBack},'←'),
+      React.createElement('div',{style:{fontSize:15,fontWeight:800}},tr('اختر نوع الحساب')),
+      React.createElement('div',{style:{width:34}})),
+    React.createElement('div',{className:'scroll pad'},
+      roles.map(([id,label])=>React.createElement('div',{key:id,onClick:()=>onPick(id),className:'card',
+        style:{display:'flex',alignItems:'center',gap:14,marginBottom:12,cursor:'pointer',transition:'transform .14s var(--spring)'},
+        onMouseDown:e=>e.currentTarget.style.transform='scale(.98)',onMouseUp:e=>e.currentTarget.style.transform=''},
+        React.createElement('div',{style:{fontSize:30,width:52,height:52,borderRadius:14,background:'var(--navy)',display:'flex',alignItems:'center',justifyContent:'center'}},icon[id]),
+        React.createElement('div',{style:{flex:1}},React.createElement('div',{style:{fontSize:16,fontWeight:800}},tr(label))),
+        React.createElement('div',{style:{color:'var(--orange)',fontSize:20}},'‹')))));
+}
+// ── Avatar picker ─────────────────────────────────────────────
+function AvatarPicker({url,onFile,size=88}){
+  const ref=useRef(null);
+  return React.createElement('div',{style:{display:'flex',justifyContent:'center',marginBottom:14}},
+    React.createElement('div',{onClick:()=>ref.current&&ref.current.click(),
+      style:{width:size,height:size,borderRadius:'50%',background:'var(--navy)',border:'2px solid var(--orange)',
+      display:'flex',alignItems:'center',justifyContent:'center',cursor:'pointer',overflow:'hidden',position:'relative'}},
+      url?React.createElement('img',{src:url,style:{width:'100%',height:'100%',objectFit:'cover'}})
+         :React.createElement('div',{style:{fontSize:26}},'📷'),
+      React.createElement('input',{ref,type:'file',accept:'image/*',style:{display:'none'},onChange:e=>{const f=e.target.files&&e.target.files[0];if(f)onFile(f);}})));
+}
+// ── Auth (login / register) ───────────────────────────────────
+function AuthScreen({role,onAuth,onBack,showToast}){
+  const canRegister = true;
+  const [mode,setMode]=useState('login');
+  const [zone,setZone]=useState(ZONES[0]);
+  const [name,setName]=useState('');
+  const [phone,setPhone]=useState('');
+  const [pass,setPass]=useState('');
+  const [photoFile,setPhotoFile]=useState(null);
+  const [photoPrev,setPhotoPrev]=useState('');
+  const [busy,setBusy]=useState(false);
+  const roleTitle={admin:'لوحة الإدارة BRCC',mechanic:'الميكانيكي',client:'صاحب السيارة'}[role];
+  const pickPhoto=(f)=>{setPhotoFile(f);setPhotoPrev(URL.createObjectURL(f));};
+
+  const doRegister=async()=>{
+    if(!name.trim()||!phone.trim()||!pass.trim()){showToast('⚠️ '+tr('أكمل جميع الحقول'));return;}
+    if(pass.length<8){showToast('⚠️ '+tr('كلمة المرور 8 أحرف على الأقل'));return;}
+    setBusy(true);
+    try{
+      const ex=await sb.from('app_users').select('id').eq('phone',phone.trim()).maybeSingle();
+      if(ex.data){setBusy(false);showToast('⚠️ '+tr('رقم الهاتف مسجّل مسبقاً'));return;}
+      const salt=randSalt(); const ph=await hashPass(pass,salt);
+      let photo_url=null; if(photoFile){try{photo_url=await uploadAvatar(photoFile);}catch(e){console.error(e);}}
+      const row={role,phone:phone.trim(),pass_hash:ph,salt,name:name.trim(),photo_url,status:role==='mechanic'?'available':'active'};
+      if(role==='mechanic') row.zone=zone;
+      if(role==='client') row.approval='pending';
+      const ins=await sb.from('app_users').insert(row).select().single();
+      setBusy(false);
+      if(ins.error){showToast('⚠️ '+ins.error.message);return;}
+      haptic([30,50,120]);
+      showToast(role==='client'?('🕓 '+tr('تم إرسال طلبك — بانتظار موافقة الإدارة')):('✅ '+tr('تم إنشاء الحساب بنجاح')));
+      setMode('login'); setPass('');
+    }catch(e){setBusy(false);console.error(e);showToast('⚠️ '+(e.message||'error'));}
+  };
+  const doLogin=async()=>{
+    if(!phone.trim()||!pass.trim()){showToast('⚠️ '+tr('أكمل جميع الحقول'));return;}
+    setBusy(true);
+    try{
+      const q=await sb.from('app_users').select('*').eq('phone',phone.trim()).eq('role',role).maybeSingle();
+      if(!q.data){setBusy(false);showToast('❌ '+tr('بيانات الدخول غير صحيحة'));return;}
+      const ph=await hashPass(pass,q.data.salt);
+      setBusy(false);
+      if(ph!==q.data.pass_hash){showToast('❌ '+tr('بيانات الدخول غير صحيحة'));return;}
+      if(q.data.role==='client'&&q.data.approval==='pending'){showToast('🕓 '+tr('حسابك بانتظار موافقة الإدارة'));return;}
+      haptic(30); saveSession(q.data); onAuth(q.data);
+    }catch(e){setBusy(false);console.error(e);showToast('⚠️ '+(e.message||'error'));}
+  };
+
+  return React.createElement('div',{className:'app fade-in'},
+    React.createElement('div',{className:'topbar'},
+      React.createElement('button',{className:'btn-sm btn-ghost',onClick:onBack},'←'),
+      React.createElement('div',{style:{fontSize:15,fontWeight:800}},tr(roleTitle)),
+      React.createElement('div',{style:{width:34}})),
+    React.createElement('div',{className:'scroll pad'},
+      React.createElement('div',{className:'card'},
+        mode==='register'&&React.createElement(AvatarPicker,{url:photoPrev,onFile:pickPhoto}),
+        mode==='register'&&React.createElement('div',{className:'field'},
+          React.createElement('label',{className:'label'},tr('الاسم الكامل')),
+          React.createElement('input',{className:'input',value:name,onChange:e=>setName(e.target.value),placeholder:tr('الاسم الكامل')})),
+        mode==='register'&&role==='mechanic'&&React.createElement('div',{className:'field'},
+          React.createElement('label',{className:'label'},tr('المنطقة')),
+          React.createElement('select',{className:'zone-sel',value:zone,onChange:e=>setZone(e.target.value)},
+            ZONES.map(z=>React.createElement('option',{key:z,value:z},z)))),
+        React.createElement('div',{className:'field'},
+          React.createElement('label',{className:'label'},tr('رقم الهاتف')),
+          React.createElement('input',{className:'input',inputMode:'tel',value:phone,onChange:e=>setPhone(e.target.value),placeholder:'46354723'})),
+        React.createElement('div',{className:'field'},
+          React.createElement('label',{className:'label'},tr('كلمة المرور')),
+          React.createElement('input',{className:'input',type:'password',value:pass,onChange:e=>setPass(e.target.value),placeholder:'••••••••',
+            onKeyDown:e=>e.key==='Enter'&&(mode==='login'?doLogin():doRegister())})),
+        React.createElement('button',{className:'btn btn-primary',disabled:busy,onClick:mode==='login'?doLogin:doRegister},
+          busy?React.createElement(React.Fragment,null,React.createElement('span',{className:'loader'}),' ',tr('جارٍ...'))
+              :(mode==='login'?tr('تسجيل الدخول'):tr('إنشاء حساب'))),
+        canRegister&&React.createElement('button',{className:'btn btn-outline',style:{marginTop:10},onClick:()=>{setMode(mode==='login'?'register':'login');setPass('');}},
+          mode==='login'?tr('ليس لديك حساب؟ أنشئ حساباً'):tr('لديك حساب؟ سجّل الدخول')),
+        role==='client'&&React.createElement('div',{className:'hint',style:{marginTop:12,textAlign:'center'}},tr('حسابات العملاء تحتاج موافقة الإدارة'))))); 
+}
+// ── Placeholder ───────────────────────────────────────────────
+function Placeholder({title}){
+  return React.createElement('div',{className:'scroll pad fade-in',style:{display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',gap:12,textAlign:'center',minHeight:'60%'}},
+    React.createElement('div',{style:{fontSize:44}},'🛠️'),
+    React.createElement('div',{style:{fontSize:17,fontWeight:800}},tr(title)),
+    React.createElement('span',{className:'badge badge-orange'},tr('قيد الإنشاء')),
+    React.createElement('div',{className:'hint',style:{maxWidth:260}},tr('هذه الصفحة ستكون جاهزة في المرحلة القادمة')));
+}
+// ── Bottom nav ────────────────────────────────────────────────
+function BottomNav({items,active,onNav}){
+  return React.createElement('div',{style:{display:'flex',alignItems:'center',padding:'8px 4px',paddingBottom:'calc(8px + env(safe-area-inset-bottom))',
+    background:'var(--glass)',backdropFilter:'blur(20px) saturate(140%)',WebkitBackdropFilter:'blur(20px) saturate(140%)',
+    borderTop:'1px solid var(--line)',flexShrink:0}},
+    items.map(it=>React.createElement('button',{key:it.id,onClick:()=>onNav(it.id),
+      style:{flex:1,display:'flex',flexDirection:'column',alignItems:'center',gap:3,padding:'6px 2px',background:'transparent',
+      color:active===it.id?'var(--orange)':'var(--muted)',fontSize:10,fontWeight:700}},
+      React.createElement('div',{style:{fontSize:19}},it.icon),
+      React.createElement('div',null,tr(it.label)))));
+}
+// ── Settings (shared) ─────────────────────────────────────────
+function Settings({user,onLogout,onUpdate,showToast}){
+  const [photoBusy,setPhotoBusy]=useState(false);
+  const [big,setBig]=useState(TEXTSCALE);
+  const [pushOn,setPushOn]=useState(typeof Notification!=='undefined'&&Notification.permission==='granted');
+  const [np,setNp]=useState('');
+  const roleLbl={admin:'الإدارة',mechanic:'الميكانيكي',client:'العميل'}[user.role];
+  const changePhoto=async(f)=>{setPhotoBusy(true);try{const url=await uploadAvatar(f);await sb.from('app_users').update({photo_url:url}).eq('id',user.id);onUpdate({photo_url:url});haptic(20);showToast('✅ '+tr('تم الحفظ'));}catch(e){showToast('⚠️ '+(e.message||'error'));}setPhotoBusy(false);};
+  const changePass=async()=>{if(np.length<8){showToast('⚠️ '+tr('كلمة المرور 8 أحرف على الأقل'));return;}const salt=randSalt();const ph=await hashPass(np,salt);await sb.from('app_users').update({pass_hash:ph,salt}).eq('id',user.id);setNp('');haptic(20);showToast('✅ '+tr('تم الحفظ'));};
+  const row=(label,el)=>React.createElement('div',{style:{display:'flex',alignItems:'center',justifyContent:'space-between',gap:10,padding:'12px 0',borderTop:'1px solid var(--line)'}},React.createElement('span',{style:{fontSize:13,color:'var(--muted)',fontWeight:700}},tr(label)),el);
+  return React.createElement('div',{className:'scroll pad fade-in'},
+    React.createElement('div',{className:'card',style:{textAlign:'center',marginBottom:14}},
+      React.createElement(AvatarPicker,{url:user.photo_url,onFile:changePhoto}),
+      React.createElement('div',{style:{fontSize:17,fontWeight:800}},user.name||'—'),
+      React.createElement('div',{style:{fontSize:12,color:'var(--muted)',marginTop:2}},user.phone),
+      React.createElement('span',{className:'badge badge-orange',style:{marginTop:8}},tr(roleLbl)),
+      photoBusy&&React.createElement('div',{style:{marginTop:8}},React.createElement('span',{className:'loader'}))),
+    React.createElement('div',{className:'card',style:{marginBottom:14}},
+      React.createElement('div',{className:'section-title'},tr('تغيير كلمة المرور')),
+      React.createElement('div',{style:{display:'flex',gap:8}},
+        React.createElement('input',{className:'input',type:'password',placeholder:'••••••••',value:np,onChange:e=>setNp(e.target.value)}),
+        React.createElement('button',{className:'btn btn-yellow btn-sm',onClick:changePass},tr('الحفظ')))),
+    React.createElement('div',{className:'card',style:{marginBottom:14}},
+      row('إشعارات الطلبات',React.createElement('span',{className:'badge badge-green'},'ON')),
+      row('نص كبير',React.createElement('button',{className:'sw-toggle'+(big?' on':''),onClick:()=>{const v=!big;setBig(v);applyTextScale(v);haptic(12);}},React.createElement('div',{className:'knob'}))),
+      row('تفعيل الإشعارات',pushOn
+        ?React.createElement('span',{className:'badge badge-green'},'✓ '+tr('الإشعارات مفعّلة'))
+        :React.createElement('button',{className:'btn btn-sm btn-yellow',onClick:async()=>{const r=await enablePush(user);if(r.ok){setPushOn(true);haptic(20);showToast('🔔 '+tr('تم تفعيل الإشعارات'));}else showToast('⚠️ '+tr('تم رفض الإشعارات'));}},'🔔 '+tr('تفعيل الإشعارات'))),
+      row('تواصل معنا',React.createElement('span',{style:{fontSize:13}},'+222 33445125'))),
+    React.createElement('button',{className:'btn btn-outline',onClick:onLogout,style:{color:'var(--red)',borderColor:'rgba(226,55,68,.4)'}},'🚪 '+tr('تسجيل الخروج')),
+    React.createElement('div',{style:{textAlign:'center',marginTop:20,fontSize:11,color:'var(--muted)'}},'A Planet T&L SUARL © 2026'));
+}
+// ── Pending client approvals (admin) ──────────────────────────
+function PendingApprovals({showToast}){
+  const [list,setList]=useState(null);
+  const load=useCallback(()=>{if(!sb){setList([]);return;}
+    sb.from('app_users').select('id,name,phone,photo_url,created_at').eq('role','client').eq('approval','pending').order('created_at',{ascending:false}).then(({data})=>setList(data||[]));},[]);
+  useEffect(()=>{load();},[load]);
+  const decide=async(u,ok)=>{
+    if(ok) await sb.from('app_users').update({approval:'approved'}).eq('id',u.id);
+    else await sb.from('app_users').delete().eq('id',u.id);
+    haptic(20);showToast(ok?('✅ '+tr('تمت الموافقة')):('✖️ '+tr('تم الرفض')));load();
+  };
+  if(list===null)return null;
+  if(list.length===0)return null;
+  return React.createElement('div',{className:'card',style:{marginBottom:14}},
+    React.createElement('div',{className:'section-title'},'🕓 '+tr('طلبات الحسابات')+' ('+list.length+')'),
+    list.map(u=>React.createElement('div',{key:u.id,className:'pend-row'},
+      React.createElement('div',{className:'mech-av'},u.photo_url?React.createElement('img',{src:u.photo_url}):'👤'),
+      React.createElement('div',{style:{flex:1}},
+        React.createElement('div',{style:{fontSize:14,fontWeight:800}},u.name),
+        React.createElement('div',{style:{fontSize:12,color:'var(--muted)'}},u.phone)),
+      React.createElement('button',{className:'btn btn-sm',style:{background:'var(--green)',color:'#fff'},onClick:()=>decide(u,true)},'✓'),
+      React.createElement('button',{className:'btn btn-sm btn-outline',style:{color:'var(--red)'},onClick:()=>decide(u,false)},'✕'))));
+}
+// ── Create client (admin) ─────────────────────────────────────
+function CreateClient({showToast}){
+  const [name,setName]=useState('');const [phone,setPhone]=useState('');const [pass,setPass]=useState('');
+  const [file,setFile]=useState(null);const [prev,setPrev]=useState('');const [busy,setBusy]=useState(false);
+  const create=async()=>{
+    if(!name.trim()||!phone.trim()||!pass.trim()){showToast('⚠️ '+tr('أكمل جميع الحقول'));return;}
+    if(pass.length<8){showToast('⚠️ '+tr('كلمة المرور 8 أحرف على الأقل'));return;}
+    setBusy(true);
+    try{
+      const ex=await sb.from('app_users').select('id').eq('phone',phone.trim()).maybeSingle();
+      if(ex.data){setBusy(false);showToast('⚠️ '+tr('رقم الهاتف مسجّل مسبقاً'));return;}
+      const salt=randSalt();const ph=await hashPass(pass,salt);
+      let photo_url=null;if(file){try{photo_url=await uploadAvatar(file);}catch(e){}}
+      const ins=await sb.from('app_users').insert({role:'client',phone:phone.trim(),pass_hash:ph,salt,name:name.trim(),photo_url,status:'active',approval:'approved'}).select().single();
+      setBusy(false);
+      if(ins.error){showToast('⚠️ '+ins.error.message);return;}
+      haptic([30,50,120]);showToast('✅ '+tr('تم إنشاء حساب العميل'));setName('');setPhone('');setPass('');setFile(null);setPrev('');
+    }catch(e){setBusy(false);showToast('⚠️ '+(e.message||'error'));}
+  };
+  return React.createElement('div',{className:'scroll pad fade-in'},
+    React.createElement(PendingApprovals,{showToast}),
+    React.createElement('div',{className:'card'},
+      React.createElement('div',{className:'section-title'},tr('إنشاء حساب عميل')),
+      React.createElement(AvatarPicker,{url:prev,onFile:f=>{setFile(f);setPrev(URL.createObjectURL(f));}}),
+      React.createElement('div',{className:'field'},React.createElement('label',{className:'label'},tr('الاسم الكامل')),
+        React.createElement('input',{className:'input',value:name,onChange:e=>setName(e.target.value)})),
+      React.createElement('div',{className:'field'},React.createElement('label',{className:'label'},tr('رقم الهاتف')),
+        React.createElement('input',{className:'input',inputMode:'tel',value:phone,onChange:e=>setPhone(e.target.value)})),
+      React.createElement('div',{className:'field'},React.createElement('label',{className:'label'},tr('كلمة المرور')),
+        React.createElement('input',{className:'input',type:'password',value:pass,onChange:e=>setPass(e.target.value),placeholder:'••••••••'})),
+      React.createElement('button',{className:'btn btn-primary',disabled:busy,onClick:create},
+        busy?React.createElement(React.Fragment,null,React.createElement('span',{className:'loader'}),' ',tr('جارٍ...')):tr('إنشاء الحساب'))));
+}
+// ── Client home (single service + SOS) ────────────────────────
+function ClientHome({user,showToast,onStart}){
+  return React.createElement('div',{className:'scroll fade-in'},
+    React.createElement('div',{style:{position:'relative',height:150,overflow:'hidden'}},
+      React.createElement('img',{src:'najda-hero-2.jpg',style:{width:'100%',height:'100%',objectFit:'cover'}}),
+      React.createElement('div',{style:{position:'absolute',inset:0,background:'linear-gradient(180deg,rgba(20,23,28,.5),rgba(20,23,28,.96))'}}),
+      React.createElement('div',{style:{position:'absolute',bottom:14,insetInlineStart:18,insetInlineEnd:18}},
+        React.createElement('div',{style:{fontSize:18,fontWeight:900}},tr('مرحباً بك عميلنا الكريم')+(user.name?('، '+user.name):'')),
+        React.createElement('div',{style:{fontSize:12,color:'var(--muted)',marginTop:4}},tr('نحن هنا على مدار الساعة لإصلاح سيارتك')))),
+    React.createElement('div',{className:'pad'},
+      React.createElement('div',{onClick:()=>{haptic(30);onStart();},
+        style:{background:'linear-gradient(135deg,var(--orange),var(--orange-d))',borderRadius:18,padding:'26px 18px',textAlign:'center',cursor:'pointer',boxShadow:'0 10px 28px rgba(255,106,0,.35)',marginBottom:16}},
+        React.createElement('div',{style:{fontSize:52,marginBottom:6}},'🆘'),
+        React.createElement('div',{style:{fontSize:15,fontWeight:800,color:'#fff'}},tr('جميع الأعطال الميكانيكية لسيارتك')),
+        React.createElement('div',{style:{fontSize:18,fontWeight:900,color:'#fff',marginTop:6}},tr('اطلب ميكانيكي الآن')))));
+}
+
+// ── Media upload (photos ≤10, videos ≤5 <60s) ─────────────────
+function MediaUpload({media,setMedia,showToast}){
+  const imgRef=useRef(null),vidRef=useRef(null);
+  const [busy,setBusy]=useState(false);
+  const imgs=media.filter(m=>m.type==='image'), vids=media.filter(m=>m.type==='video');
+  const addImages=async(e)=>{
+    const files=Array.from(e.target.files||[]); if(imgRef.current)imgRef.current.value='';
+    if(imgs.length+files.length>10){showToast(tr('⚠️ حد أقصى 10 صور'));return;}
+    setBusy(true);
+    for(const f of files){try{const url=await uploadMedia(f);setMedia(prev=>[...prev,{type:'image',url}]);}catch(err){console.error(err);}}
+    setBusy(false);haptic(15);
+  };
+  const addVideos=async(e)=>{
+    const files=Array.from(e.target.files||[]); if(vidRef.current)vidRef.current.value='';
+    if(vids.length+files.length>5){showToast(tr('⚠️ حد أقصى 5 فيديوهات'));return;}
+    setBusy(true);
+    for(const f of files){const d=await videoDuration(f);if(d>62){showToast(tr('⚠️ الفيديو أطول من دقيقة'));continue;}try{const url=await uploadMedia(f);setMedia(prev=>[...prev,{type:'video',url}]);}catch(err){console.error(err);}}
+    setBusy(false);haptic(15);
+  };
+  const remove=(url)=>setMedia(prev=>prev.filter(m=>m.url!==url));
+  return React.createElement('div',null,
+    React.createElement('div',{style:{display:'grid',gridTemplateColumns:'1fr 1fr',gap:9}},
+      React.createElement('button',{className:'up-btn',style:{aspectRatio:'auto',padding:'12px'},onClick:()=>imgRef.current&&imgRef.current.click()},
+        React.createElement('span',{style:{fontSize:22}},'📷'),tr('أضف صوراً')+' ('+imgs.length+'/10)'),
+      React.createElement('button',{className:'up-btn',style:{aspectRatio:'auto',padding:'12px'},onClick:()=>vidRef.current&&vidRef.current.click()},
+        React.createElement('span',{style:{fontSize:22}},'🎬'),tr('أضف فيديو')+' ('+vids.length+'/5)')),
+    React.createElement('input',{ref:imgRef,type:'file',accept:'image/*',multiple:true,style:{display:'none'},onChange:addImages}),
+    React.createElement('input',{ref:vidRef,type:'file',accept:'video/*',multiple:true,style:{display:'none'},onChange:addVideos}),
+    busy&&React.createElement('div',{style:{textAlign:'center',marginTop:10}},React.createElement('span',{className:'loader'})),
+    media.length>0&&React.createElement('div',{className:'media-grid'},
+      media.map(m=>React.createElement('div',{key:m.url,className:'media-item'},
+        m.type==='image'?React.createElement('img',{src:m.url}):React.createElement('video',{src:m.url,muted:true}),
+        m.type==='video'&&React.createElement('div',{className:'vtag'},'▶️'),
+        React.createElement('button',{className:'rm',onClick:()=>remove(m.url)},'✕')))));
+}
+// ── Payment select (bank logos) ───────────────────────────────
+function PaymentSelect({value,onSelect}){
+  return React.createElement('div',{className:'pm-grid'},
+    PAY_METHODS.map(m=>React.createElement('div',{key:m.id,className:'pm-card'+(value===m.id?' sel':''),onClick:()=>{haptic(12);onSelect(m.id);}},
+      m.logo?React.createElement('img',{src:m.logo,alt:''}):React.createElement('div',{className:'pmc'},m.icon),
+      React.createElement('div',{className:'pmn'},tr(m.name)))));
+}
+// ── Request flow (wizard) ─────────────────────────────────────
+function RequestFlow({user,onSubmitted,onCancel,showToast}){
+  const [step,setStep]=useState(1);
+  const [tier,setTier]=useState(null);
+  const [name,setName]=useState(user.name||'');
+  const [phone,setPhone]=useState(user.phone||'');
+  const [locText,setLocText]=useState('');const [lat,setLat]=useState(null);const [lng,setLng]=useState(null);
+  const [details,setDetails]=useState('');
+  const [media,setMedia]=useState([]);
+  const [pay,setPay]=useState(null);
+  const [zone,setZone]=useState(ZONES[0]);
+  const [gps,setGps]=useState(false);const [busy,setBusy]=useState(false);
+  const locate=()=>{if(!navigator.geolocation){showToast('⚠️ GPS');return;}setGps(true);
+    navigator.geolocation.getCurrentPosition(p=>{setLat(p.coords.latitude);setLng(p.coords.longitude);
+      setLocText('📍 '+p.coords.latitude.toFixed(5)+', '+p.coords.longitude.toFixed(5));setGps(false);haptic(15);showToast('✅ '+tr('تم تحديد الموقع'));},
+      ()=>{setGps(false);showToast('⚠️ '+tr('حدد موقعك'));},{enableHighAccuracy:true,timeout:10000});};
+  const submit=async()=>{
+    if(!pay){showToast(tr('⚠️ اختر وسيلة الدفع'));return;}
+    const payload={client_id:user.id,client_name:name.trim(),client_phone:phone.trim(),
+      tier,location:locText.trim(),latitude:lat,longitude:lng,details:details.trim()||null,
+      zone,media,payment_method:pay,status:'pending',payment_status:'unpaid'};
+    if(!navigator.onLine){queueRequest(payload);showToast('📴 '+tr('لا يوجد اتصال — سيُرسل الطلب تلقائياً'));onCancel();return;}
+    setBusy(true);
+    try{
+      const ins=await sb.from('brcc_requests').insert(payload).select().single();
+      setBusy(false);
+      if(ins.error){showToast('⚠️ '+ins.error.message);return;}
+      haptic([40,60,140]);showToast(tr('✅ تم إرسال طلبك'));waAlert(ins.data);onSubmitted(ins.data);
+    }catch(e){setBusy(false);showToast('⚠️ '+(e.message||'error'));}
+  };
+  const head=(n,t)=>React.createElement('div',{className:'step-head'},React.createElement('div',{className:'step-num'},n),React.createElement('div',{style:{fontSize:15,fontWeight:800}},tr(t)));
+  return React.createElement('div',{className:'scroll pad fade-in'},
+    step===1&&React.createElement('div',null,
+      head('1','اختر مستوى الخدمة'),
+      React.createElement('div',{className:'tier',onClick:()=>{setTier('normal');setStep(2);}},
+        React.createElement('div',{className:'tic'},'🔧'),
+        React.createElement('div',{style:{flex:1}},
+          React.createElement('div',{style:{fontSize:16,fontWeight:800}},tr('الخدمة العادية')),
+          React.createElement('div',{style:{fontSize:12,color:'var(--muted)',marginTop:3}},tr('الميكانيكي سيأتيك بعد التأكيد')))),
+      React.createElement('div',{className:'tier premium',onClick:()=>{setTier('premium');setStep(2);}},
+        React.createElement('div',{className:'tic'},'⚡'),
+        React.createElement('div',{style:{flex:1}},
+          React.createElement('div',{style:{fontSize:16,fontWeight:800,color:'var(--yellow)'}},tr('الخدمة المميزة')),
+          React.createElement('div',{style:{fontSize:12,color:'var(--muted)',marginTop:3}},tr('سريعة جداً — أسرع وصول ممكن')))),
+      React.createElement('button',{className:'btn btn-outline',style:{marginTop:8},onClick:onCancel},'← '+tr('رجوع'))),
+    step===2&&React.createElement('div',null,
+      head('2','بيانات الطلب'),
+      React.createElement('div',{className:'card'},
+        React.createElement('div',{className:'field'},React.createElement('label',{className:'label'},tr('الاسم الكامل')),
+          React.createElement('input',{className:'input',value:name,onChange:e=>setName(e.target.value)})),
+        React.createElement('div',{className:'field'},React.createElement('label',{className:'label'},tr('رقم الهاتف')),
+          React.createElement('input',{className:'input',inputMode:'tel',value:phone,onChange:e=>setPhone(e.target.value)})),
+        React.createElement('div',{className:'field'},React.createElement('label',{className:'label'},tr('الموقع')),
+          React.createElement('div',{style:{display:'flex',gap:8}},
+            React.createElement('input',{className:'input',value:locText,onChange:e=>setLocText(e.target.value),placeholder:tr('أدخل موقعك أو اضغط للتحديد')}),
+            React.createElement('button',{className:'btn btn-yellow btn-sm',onClick:locate,style:{flexShrink:0}},gps?React.createElement('span',{className:'loader'}):'📍'))),
+        React.createElement('div',{className:'field'},React.createElement('label',{className:'label'},tr('المنطقة')),
+          React.createElement('select',{className:'zone-sel',value:zone,onChange:e=>setZone(e.target.value)},
+            ZONES.map(z=>React.createElement('option',{key:z,value:z},z)))),
+        React.createElement('div',{className:'field'},React.createElement('label',{className:'label'},tr('تفاصيل العطل')),
+          React.createElement('textarea',{className:'input',rows:3,value:details,onChange:e=>setDetails(e.target.value),placeholder:tr('اكتب وصف المشكلة')})),
+        React.createElement('div',{className:'field'},React.createElement('label',{className:'label'},tr('الصور والفيديوهات')),
+          React.createElement('div',{className:'hint',style:{marginBottom:8}},tr('حتى 10 صور و5 فيديوهات قصيرة')),
+          React.createElement(MediaUpload,{media,setMedia,showToast}))),
+      React.createElement('div',{style:{display:'flex',gap:10,marginTop:6}},
+        React.createElement('button',{className:'btn btn-outline',onClick:()=>setStep(1)},'← '+tr('رجوع')),
+        React.createElement('button',{className:'btn btn-primary',onClick:()=>{if(!locText.trim()){showToast(tr('⚠️ حدد موقعك'));return;}setStep(3);}},tr('التالي')+' →'))),
+    step===3&&React.createElement('div',null,
+      head('3','وسيلة الدفع'),
+      React.createElement('div',{className:'card'},
+        React.createElement('div',{className:'hint',style:{marginBottom:12}},tr('اختر وسيلة الدفع — تأكيد فقط')+' · '+tr('الدفع بعد الإصلاح')),
+        React.createElement(PaymentSelect,{value:pay,onSelect:setPay})),
+      React.createElement('div',{style:{display:'flex',gap:10,marginTop:14}},
+        React.createElement('button',{className:'btn btn-outline',onClick:()=>setStep(2)},'← '+tr('رجوع')),
+        React.createElement('button',{className:'btn btn-primary',disabled:busy,onClick:submit},
+          busy?React.createElement(React.Fragment,null,React.createElement('span',{className:'loader'}),' ',tr('جارٍ الإرسال...')):('🆘 '+tr('إرسال الطلب للميكانيكي'))))));
+}
+
+// ── Shell (role dashboard wrapper) ────────────────────────────
+function Shell({user,onLogout,onUpdate,lang,onLang,showToast}){
+  const navByRole={
+    admin:[{id:'requests',icon:'📋',label:'الطلبات'},{id:'mechanics',icon:'🔧',label:'الميكانيكيون'},{id:'clients',icon:'➕',label:'العميل'},{id:'account',icon:'⚙️',label:'حسابي'}],
+    mechanic:[{id:'tasks',icon:'🧰',label:'مهامي'},{id:'history',icon:'🕓',label:'السجل'},{id:'account',icon:'⚙️',label:'حسابي'}],
+    client:[{id:'home',icon:'🏠',label:'الرئيسية'},{id:'status',icon:'📍',label:'الوضعية'},{id:'account',icon:'⚙️',label:'حسابي'}]
+  };
+  const items=navByRole[user.role];
+  const [page,setPage]=useState(items[0].id);
+  const title={admin:'لوحة الإدارة BRCC',mechanic:'الميكانيكي',client:'صاحب السيارة'}[user.role];
+  let content;
+  if(page==='account') content=React.createElement(Settings,{user,onLogout,onUpdate,showToast});
+  else if(user.role==='admin'&&page==='clients') content=React.createElement(CreateClient,{showToast});
+  else if(user.role==='client'&&page==='home') content=React.createElement(ClientHome,{user,showToast});
+  else content=React.createElement(Placeholder,{title:(items.find(i=>i.id===page)||{}).label||title});
+  return React.createElement('div',{className:'app'},
+    React.createElement('div',{className:'topbar'},
+      React.createElement('div',{className:'topbar-brand'},
+        React.createElement('img',{src:'najda-logo-icon.svg'}),
+        React.createElement('div',null,
+          React.createElement('div',{className:'tt'},tr(title)),
+          React.createElement('div',{className:'ts'},'BRCC AUTO'))),
+      React.createElement(LangSwitcher,{lang,onLang})),
+    content,
+    React.createElement(BottomNav,{items,active:page,onNav:setPage}));
+}
+
+
+// ── Live map (Leaflet) ────────────────────────────────────────
+function haversine(la1,ln1,la2,ln2){const R=6371,d=x=>x*Math.PI/180;const a=Math.sin(d(la2-la1)/2)**2+Math.cos(d(la1))*Math.cos(d(la2))*Math.sin(d(ln2-ln1)/2)**2;return R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));}
+function LiveMap({clientLat,clientLng,mechLat,mechLng}){
+  const el=useRef(null),map=useRef(null),cM=useRef(null),mM=useRef(null),line=useRef(null),cur=useRef(null),raf=useRef(null),fit=useRef(false);
+  useEffect(()=>{
+    if(!window.L||!el.current)return;
+    const c=[clientLat||18.0858,clientLng||-15.9785];
+    const m=L.map(el.current,{zoomControl:false,attributionControl:false}).setView(c,14);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19}).addTo(m);
+    map.current=m;
+    if(clientLat&&clientLng){cM.current=L.marker([clientLat,clientLng],{icon:L.divIcon({className:'',html:'<div class="mk-pin">📍</div>',iconSize:[26,26],iconAnchor:[13,26]})}).addTo(m);}
+    setTimeout(()=>{try{m.invalidateSize();}catch(e){}},250);
+    return()=>{if(raf.current)cancelAnimationFrame(raf.current);try{m.remove();}catch(e){}};
+  },[]);
+  useEffect(()=>{if(!map.current||!clientLat||!clientLng)return;if(cM.current)cM.current.setLatLng([clientLat,clientLng]);
+    else cM.current=L.marker([clientLat,clientLng],{icon:L.divIcon({className:'',html:'<div class="mk-pin">📍</div>',iconSize:[26,26],iconAnchor:[13,26]})}).addTo(map.current);},[clientLat,clientLng]);
+  useEffect(()=>{
+    if(!map.current||mechLat==null||mechLng==null)return;
+    const target=[mechLat,mechLng];
+    if(!mM.current){mM.current=L.marker(target,{icon:L.divIcon({className:'',html:'<div class="mk-pin">🚗</div>',iconSize:[30,30],iconAnchor:[15,15]})}).addTo(map.current);cur.current=target;}
+    if(!line.current&&clientLat&&clientLng){line.current=L.polyline([target,[clientLat,clientLng]],{color:'#FF6A00',weight:3,dashArray:'6,8',opacity:.85}).addTo(map.current);}
+    const start=cur.current||target,t0=performance.now(),dur=900;
+    const step=(t)=>{const k=Math.min(1,(t-t0)/dur);const la=start[0]+(target[0]-start[0])*k,ln=start[1]+(target[1]-start[1])*k;
+      if(mM.current)mM.current.setLatLng([la,ln]);if(line.current&&clientLat)line.current.setLatLngs([[la,ln],[clientLat,clientLng]]);
+      if(k<1)raf.current=requestAnimationFrame(step);else cur.current=target;};
+    if(raf.current)cancelAnimationFrame(raf.current);raf.current=requestAnimationFrame(step);
+    if(clientLat&&clientLng&&!fit.current){try{map.current.fitBounds(L.latLngBounds([target,[clientLat,clientLng]]).pad(0.5));fit.current=true;}catch(e){}}
+  },[mechLat,mechLng]);
+  return React.createElement('div',{ref:el,className:'livemap'});
+}
+// ── Track panel (client/admin/mechanic view) ──────────────────
+function TrackPanel({req}){
+  const has=req.mechanic_lat!=null&&req.mechanic_lng!=null;
+  const dist=(has&&req.latitude)?haversine(req.mechanic_lat,req.mechanic_lng,req.latitude,req.longitude):null;
+  const eta=dist!=null?Math.max(1,Math.round(dist/30*60)):null;
+  return React.createElement('div',{className:'card',style:{marginBottom:14}},
+    React.createElement('div',{className:'track-hd'},
+      React.createElement('div',{style:{fontSize:14,fontWeight:800}},'🚗 '+tr('تتبّع مباشر')),
+      React.createElement('span',{className:'track-live'},React.createElement('span',{className:'dot'}),'LIVE')),
+    React.createElement(LiveMap,{clientLat:req.latitude,clientLng:req.longitude,mechLat:req.mechanic_lat,mechLng:req.mechanic_lng}),
+    React.createElement('div',{style:{textAlign:'center',fontSize:12,color:'var(--muted)',marginTop:8}},
+      has?(dist!=null?(tr('الميكانيكي في الطريق إليك')+' · '+tr('يبعد')+' ~'+dist.toFixed(1)+' '+tr('كم')+' · '+tr('الوصول خلال')+' ~'+eta+' '+tr('دقيقة')):tr('الميكانيكي في الطريق إليك')):('🕓 '+tr('بانتظار موقع الميكانيكي'))));
+}
+
+// ── In-app chat (client ↔ mechanic) ───────────────────────────
+function ChatPanel({req,me,role}){
+  const [msgs,setMsgs]=useState([]);const [txt,setTxt]=useState('');const endRef=useRef(null);
+  useEffect(()=>{
+    if(!sb||!req)return;let alive=true;
+    sb.from('brcc_messages').select('*').eq('request_id',req.id).order('created_at',{ascending:true})
+      .then(({data})=>{if(alive)setMsgs(data||[]);});
+    const ch=sb.channel('chat-'+req.id)
+      .on('postgres_changes',{event:'INSERT',schema:'public',table:'brcc_messages',filter:'request_id=eq.'+req.id},p=>{
+        setMsgs(prev=>prev.some(m=>m.id===p.new.id)?prev:[...prev,p.new]);if(p.new.sender_id!==me.id)haptic(12);})
+      .subscribe();
+    return()=>{alive=false;sb.removeChannel(ch);};
+  },[req&&req.id]);
+  useEffect(()=>{try{if(endRef.current)endRef.current.scrollIntoView({block:'end'});}catch(e){}},[msgs.length]);
+  const send=async()=>{
+    const b=txt.trim();if(!b||!sb)return;setTxt('');
+    const row={request_id:req.id,sender_id:me.id,sender_role:role,sender_name:me.name||'',body:b};
+    const ins=await sb.from('brcc_messages').insert(row).select().single();
+    if(!ins.error){haptic(10);setMsgs(prev=>prev.some(m=>m.id===ins.data.id)?prev:[...prev,ins.data]);}
+  };
+  return React.createElement('div',{className:'card',style:{marginBottom:14}},
+    React.createElement('div',{style:{fontSize:14,fontWeight:800,marginBottom:8}},'💬 '+tr('المحادثة')),
+    React.createElement('div',{className:'chat-box'},
+      msgs.length===0?React.createElement('div',{className:'hint',style:{textAlign:'center',padding:10}},tr('لا توجد رسائل بعد'))
+      :msgs.map(m=>React.createElement('div',{key:m.id,className:'msg '+(m.sender_id===me.id?'me':'them')},
+        m.sender_id!==me.id&&React.createElement('div',{className:'who'},m.sender_name||tr(m.sender_role==='mechanic'?'الميكانيكي':'العميل')),
+        m.body)),
+      React.createElement('div',{ref:endRef})),
+    React.createElement('div',{className:'chat-in'},
+      React.createElement('input',{value:txt,onChange:e=>setTxt(e.target.value),placeholder:tr('اكتب رسالة...'),onKeyDown:e=>e.key==='Enter'&&send()}),
+      React.createElement('button',{className:'btn btn-primary btn-sm',onClick:send},'➤')));
+}
+// ── Status view (client's active request) ─────────────────────
+function StatusView({req,onUpdate,showToast,me}){
+  const fileRef=useRef(null);const [uploading,setUploading]=useState(false);
+  const [rstar,setRstar]=useState(0);const [review,setReview]=useState('');
+  const submitRating=async()=>{if(!rstar)return;if(sb)await sb.from('brcc_requests').update({rating:rstar,review:review.trim()||null}).eq('id',req.id);haptic(20);onUpdate({rating:rstar,review:review.trim()||null});showToast('⭐ '+tr('شكراً لتقييمك'));};
+  if(!req) return React.createElement('div',{className:'scroll pad fade-in',style:{display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',gap:10,minHeight:'60%',textAlign:'center'}},
+    React.createElement('div',{style:{fontSize:44}},'📭'),
+    React.createElement('div',{style:{fontSize:16,fontWeight:800}},tr('لا يوجد طلب نشط')),
+    React.createElement('div',{className:'hint'},tr('ستظهر هنا حالة طلبك')));
+  const steps=[{k:'قيد الانتظار',i:'📨'},{k:'الميكانيكي قادم',i:'🚗'},{k:'وصل الميكانيكي',i:'📍'},{k:'تم إنجاز العمل',i:'✅'}];
+  const map={pending:0,active:1,arrived:2,done:3};
+  const done=map[req.status]!==undefined?map[req.status]:0;
+  const segW=100/(steps.length-1);const rtl=document.documentElement.dir==='rtl';
+  const paid=req.payment_status==='paid',submitted=req.payment_status==='submitted';
+  const upload=async(e)=>{const f=e.target.files&&e.target.files[0];if(!f)return;setUploading(true);
+    try{const url=await uploadMedia(f);await sb.from('brcc_requests').update({receipt_url:url,payment_status:'submitted'}).eq('id',req.id);haptic([40,60,140]);onUpdate({receipt_url:url,payment_status:'submitted'});}
+    catch(err){showToast('⚠️ '+(err.message||'error'));}setUploading(false);};
+  return React.createElement('div',{className:'scroll pad fade-in'},
+    React.createElement('div',{className:'card',style:{marginBottom:14}},
+      React.createElement('div',{className:'stepper'},
+        steps.slice(0,-1).map((_,i)=>React.createElement('div',{key:'l'+i,className:'stp-line'+(i<done?' fill':''),
+          style:{[rtl?'right':'left']:'calc('+(segW*i)+'% + 18px)',width:'calc('+segW+'% - 36px)'}})),
+        steps.map((s,i)=>React.createElement('div',{key:s.k,className:'stp'+(i<=done?' done':'')+(i===done?' on':'')},
+          React.createElement('div',{className:'stp-dot'},i<done?'✓':s.i),
+          React.createElement('div',{className:'stp-lb'},tr(s.k))))),
+      React.createElement('div',{style:{textAlign:'center',fontSize:15,fontWeight:800,color:'var(--orange)',marginTop:4}},tr(steps[done].k))),
+    (req.status==='active'||req.status==='arrived')&&React.createElement(TrackPanel,{req}),
+    req.mechanic_name&&React.createElement('div',{className:'card',style:{marginBottom:14,display:'flex',alignItems:'center',gap:12}},
+      React.createElement('div',{style:{fontSize:26,width:46,height:46,borderRadius:12,background:'var(--navy)',display:'flex',alignItems:'center',justifyContent:'center'}},'🔧'),
+      React.createElement('div',{style:{flex:1}},
+        React.createElement('div',{style:{fontSize:11,color:'var(--muted)'}},tr('الميكانيكي المعيّن')),
+        React.createElement('div',{style:{fontSize:15,fontWeight:800}},req.mechanic_name)),
+      req.mechanic_phone&&React.createElement('a',{className:'call-btn',href:'tel:'+req.mechanic_phone},'📞 '+tr('اتصل'))),
+    req.mechanic_id&&me&&React.createElement(ChatPanel,{req,me,role:'client'}),
+    req.status==='done'&&React.createElement('div',{className:'card'},
+      paid?React.createElement('div',{className:'fade-in'},
+        React.createElement('div',{style:{textAlign:'center',padding:'4px'}},
+          React.createElement('div',{style:{fontSize:34}},'✅'),
+          React.createElement('div',{style:{fontSize:16,fontWeight:900,color:'var(--green)',marginTop:4}},tr('✅ تم تأكيد الدفع'))),
+        req.rating
+          ? React.createElement('div',{style:{textAlign:'center',marginTop:12}},
+              React.createElement('div',{style:{fontSize:22}},'⭐'.repeat(req.rating)),
+              React.createElement('div',{style:{fontSize:12,color:'var(--muted)',marginTop:4}},tr('شكراً لتقييمك')))
+          : React.createElement('div',{style:{marginTop:14,borderTop:'1px solid var(--line)',paddingTop:12}},
+              React.createElement('div',{style:{textAlign:'center',fontSize:13,fontWeight:800,color:'var(--orange)'}},tr('كيف كانت الخدمة؟')),
+              React.createElement('div',{className:'rating-row'},[1,2,3,4,5].map(n=>React.createElement('button',{key:n,className:'rstar'+(rstar>=n?' on':''),onClick:()=>{setRstar(n);haptic(12);}},'⭐'))),
+              React.createElement('textarea',{className:'input',rows:2,placeholder:tr('أضف تعليقاً (اختياري)'),value:review,onChange:e=>setReview(e.target.value)}),
+              React.createElement('button',{className:'btn btn-primary',style:{marginTop:8},disabled:!rstar,onClick:submitRating},tr('إرسال التقييم'))))
+      :submitted?React.createElement('div',null,
+        req.receipt_url&&React.createElement('img',{src:req.receipt_url,style:{width:'100%',maxHeight:200,objectFit:'cover',borderRadius:10,marginBottom:8}}),
+        React.createElement('div',{style:{textAlign:'center',fontSize:13,fontWeight:700,color:'var(--green)'}},'🕓 '+tr('تم رفع الوصل')),
+        React.createElement('div',{style:{textAlign:'center',fontSize:11,color:'var(--muted)',marginTop:2}},tr('بانتظار تأكيد الإدارة')))
+      :React.createElement('div',null,
+        React.createElement('div',{style:{display:'flex',alignItems:'center',gap:6,marginBottom:10}},
+          React.createElement('span',null,'💳 '),React.createElement('span',{style:{fontSize:13,fontWeight:800}},tr(payMethod(req.payment_method)?payMethod(req.payment_method).name:'وسيلة الدفع'))),
+        React.createElement('input',{ref:fileRef,type:'file',accept:'image/*',style:{display:'none'},onChange:upload}),
+        React.createElement('button',{className:'btn btn-primary',disabled:uploading,onClick:()=>fileRef.current&&fileRef.current.click()},
+          uploading?React.createElement(React.Fragment,null,React.createElement('span',{className:'loader'}),' ',tr('جارٍ الرفع...')):('📤 '+tr('رفع وصل الدفع'))))));
+}
+// ── Client shell ──────────────────────────────────────────────
+// ── Client request history ────────────────────────────────────
+function ClientHistory({user}){
+  const [reqs,setReqs]=useState(null);const [sel,setSel]=useState(null);
+  useEffect(()=>{if(!sb){setReqs([]);return;}sb.from('brcc_requests').select('*').eq('client_id',user.id).order('created_at',{ascending:false}).then(({data})=>setReqs(data||[]));},[user.id]);
+  if(reqs===null)return React.createElement(Skeleton,{n:3});
+  return React.createElement('div',{className:'scroll pad fade-in'},
+    reqs.length===0?React.createElement('div',{className:'hint',style:{textAlign:'center',padding:30}},tr('لا توجد طلبات سابقة'))
+      :reqs.map(r=>React.createElement(ReqCard,{key:r.id,r,onClick:()=>setSel(r)})),
+    sel&&React.createElement(RequestDetail,{req:sel,role:'client',onClose:()=>setSel(null),showToast:()=>{}}));
+}
+function ClientShell({user,onLogout,onUpdate,lang,onLang,showToast}){
+  const [page,setPage]=useState('home');
+  const [flow,setFlow]=useState(false);
+  const [req,setReq]=useState(null);
+  useEffect(()=>{
+    if(!sb)return;let alive=true;
+    sb.from('brcc_requests').select('*').eq('client_id',user.id).order('created_at',{ascending:false}).limit(1)
+      .then(({data})=>{if(alive&&data&&data[0])setReq(data[0]);});
+    const ch=sb.channel('cl-req-'+user.id)
+      .on('postgres_changes',{event:'*',schema:'public',table:'brcc_requests',filter:'client_id=eq.'+user.id},payload=>{
+        if(payload.new)setReq(prev=>(prev&&prev.id===payload.new.id)?{...prev,...payload.new}:(payload.eventType==='INSERT'?payload.new:prev));})
+      .subscribe();
+    return()=>{alive=false;sb.removeChannel(ch);};
+  },[user.id]);
+  const [offline,setOffline]=useState(!navigator.onLine);
+  useEffect(()=>{
+    const flush=async()=>{
+      setOffline(false);
+      const q=getQueued(); if(!q||!sb) return;
+      try{const ins=await sb.from('brcc_requests').insert(q).select().single();
+        if(!ins.error){clearQueued();setReq(ins.data);haptic([40,60,140]);showToast('✅ '+tr('تم إرسال طلبك المؤجّل'));waAlert(ins.data);}}catch(e){}
+    };
+    if(navigator.onLine) flush();
+    const off=()=>setOffline(true);
+    window.addEventListener('online',flush);window.addEventListener('offline',off);
+    return()=>{window.removeEventListener('online',flush);window.removeEventListener('offline',off);};
+  },[showToast]);
+  const items=[{id:'home',icon:'🏠',label:'الرئيسية'},{id:'status',icon:'📍',label:'الوضعية'},{id:'history',icon:'🕓',label:'السجل'},{id:'account',icon:'⚙️',label:'حسابي'}];
+  let content;
+  if(page==='account') content=React.createElement(Settings,{user,onLogout,onUpdate,showToast});
+  else if(page==='history') content=React.createElement(ClientHistory,{user});
+  else if(page==='status') content=React.createElement(StatusView,{req,onUpdate:patch=>setReq(p=>({...p,...patch})),showToast,me:user});
+  else content=flow
+    ? React.createElement(RequestFlow,{user,showToast,onCancel:()=>setFlow(false),onSubmitted:(r)=>{setReq(r);setFlow(false);setPage('status');}})
+    : React.createElement(ClientHome,{user,showToast,onStart:()=>setFlow(true)});
+  return React.createElement('div',{className:'app'},
+    offline&&React.createElement('div',{className:'offline-bar'},'📴 '+tr('لا يوجد اتصال — سيُرسل الطلب تلقائياً')),
+    React.createElement('div',{className:'topbar'},
+      React.createElement('div',{className:'topbar-brand'},
+        React.createElement('img',{src:'najda-logo-icon.svg'}),
+        React.createElement('div',null,React.createElement('div',{className:'tt'},tr('صاحب السيارة')),React.createElement('div',{className:'ts'},'BRCC AUTO'))),
+      React.createElement(LangSwitcher,{lang,onLang})),
+    content,
+    React.createElement(BottomNav,{items,active:page,onNav:(p)=>{setFlow(false);setPage(p);}}));
+}
+
+
+// ── Mechanic status meta ──────────────────────────────────────
+const MECH_STATUSES=[['available','متاح'],['busy','مشغول'],['repairing','يصلّح الآن'],['break','استراحة'],['leave','في إجازة'],['off','خارج الدوام']];
+const stClass={available:'st-available',busy:'st-busy',repairing:'st-repairing',break:'st-break',leave:'st-leave',off:'st-off'};
+function statusLabel(s){const f=MECH_STATUSES.find(x=>x[0]===s);return f?tr(f[1]):tr('متاح');}
+
+// ── Request detail (bottom sheet, shared) ─────────────────────
+function RequestDetail({req,role,mechanics,onAssign,onSetStatus,onConfirmPay,onClose,showToast,me}){
+  const [amount,setAmount]=useState('');
+  const mapUrl=(req.latitude&&req.longitude)?('https://www.google.com/maps?q='+req.latitude+','+req.longitude):null;
+  const pm=payMethod(req.payment_method);
+  const media=Array.isArray(req.media)?req.media:[];
+  const assigned=!!req.mechanic_id;
+  const next={pending:{to:'active',label:'أنا في الطريق'},active:{to:'arrived',label:'وصلت'},arrived:{to:'done',label:'إنهاء المهمة'}}[req.status];
+  return React.createElement('div',{className:'sheet',onClick:onClose},
+    React.createElement('div',{className:'sheet-inner',onClick:e=>e.stopPropagation()},
+      React.createElement('div',{className:'sheet-head'},
+        React.createElement('div',{style:{fontSize:16,fontWeight:800}},tr('تفاصيل الطلب')),
+        React.createElement('button',{className:'btn-sm btn-ghost',onClick:onClose},'✕')),
+      React.createElement('div',{className:'scroll pad'},
+        React.createElement('div',{className:'card',style:{marginBottom:12}},
+          React.createElement('div',{style:{display:'flex',justifyContent:'space-between',alignItems:'center'}},
+            React.createElement('div',{style:{fontSize:17,fontWeight:800}},req.client_name),
+            React.createElement('span',{className:'badge '+(req.tier==='premium'?'badge-orange':'badge-muted')},req.tier==='premium'?'⚡ '+tr('الخدمة المميزة'):tr('الخدمة العادية'))),
+          React.createElement('div',{className:'req-meta',style:{marginTop:8}},
+            React.createElement('span',null,'📞 '+req.client_phone),
+            React.createElement('span',null,'📍 '+(req.location||'—')),
+            req.zone&&React.createElement('span',null,'🗺️ '+req.zone)),
+          req.details&&React.createElement('div',{style:{marginTop:10,fontSize:13,color:'var(--text)',background:'rgba(255,255,255,.03)',padding:10,borderRadius:8}},req.details),
+          React.createElement('div',{style:{display:'flex',gap:8,marginTop:12}},
+            React.createElement('a',{className:'call-btn',style:{flex:1},href:'tel:'+req.client_phone},'📞 '+tr('اتصل بالعميل')),
+            mapUrl&&React.createElement('a',{className:'call-btn',style:{flex:1,background:'var(--navy-2)'},href:mapUrl,target:'_blank'},'🗺️ '+tr('عرض على الخريطة')))),
+        React.createElement('div',{className:'card',style:{marginBottom:12}},
+          React.createElement('div',{style:{fontSize:12,color:'var(--muted)',fontWeight:700,marginBottom:8}},tr('وسيلة الدفع المختارة')),
+          React.createElement('div',{style:{display:'flex',alignItems:'center',gap:8}},
+            pm&&pm.logo?React.createElement('img',{src:pm.logo,style:{width:34,height:34,objectFit:'contain',borderRadius:6,background:'#fff',padding:2}}):React.createElement('span',{style:{fontSize:24}},pm?pm.icon:'💳'),
+            React.createElement('span',{style:{fontSize:15,fontWeight:800}},tr(pm?pm.name:'—')))),
+        React.createElement('div',{className:'card',style:{marginBottom:12}},
+          React.createElement('div',{style:{fontSize:12,color:'var(--muted)',fontWeight:700,marginBottom:8}},tr('صور وفيديوهات الطلب')),
+          media.length===0?React.createElement('div',{className:'hint'},tr('لا توجد وسائط'))
+            :React.createElement('div',{className:'detail-media'},
+              media.map((m,i)=>m.type==='image'
+                ?React.createElement('img',{key:i,src:m.url,onClick:()=>window.open(m.url,'_blank')})
+                :React.createElement('video',{key:i,src:m.url,controls:true})))),
+        req.rating&&React.createElement('div',{className:'card',style:{marginBottom:12}},
+          React.createElement('div',{style:{fontSize:12,color:'var(--muted)',fontWeight:700,marginBottom:6}},tr('التقييم')),
+          React.createElement('div',{className:'mini-stars',style:{fontSize:18}},'⭐'.repeat(req.rating)+' '+req.rating+'/5'),
+          req.review&&React.createElement('div',{className:'rev-txt'},req.review)),
+        (req.status==='active'||req.status==='arrived')&&React.createElement(TrackPanel,{req}),
+        role==='mechanic'&&me&&req.mechanic_id&&React.createElement(ChatPanel,{req,me,role:'mechanic'}),
+        // ── role actions ──
+        role==='admin'&&!assigned&&req.status==='pending'&&React.createElement('div',{className:'card',style:{marginBottom:12}},
+          React.createElement('div',{style:{fontSize:13,fontWeight:800,marginBottom:10}},tr('اختر ميكانيكي')),
+          (mechanics||[]).length===0?React.createElement('div',{className:'hint'},tr('لا يوجد ميكانيكيون'))
+          :(mechanics||[]).slice().sort((a,b)=>{
+              const sc=m=>((m.zone&&req.zone&&m.zone===req.zone)?0:2)+(m.status==='available'?0:1);
+              return sc(a)-sc(b);
+            }).map(mc=>{
+              const near=mc.zone&&req.zone&&mc.zone===req.zone;
+              return React.createElement('button',{key:mc.id,className:'btn btn-outline',style:{marginBottom:8,justifyContent:'space-between',borderColor:near?'rgba(255,106,0,.5)':undefined},onClick:()=>onAssign(req,mc)},
+                React.createElement('span',{style:{display:'flex',alignItems:'center',gap:6}},'🔧 '+mc.name,
+                  near&&React.createElement('span',{className:'badge badge-orange'},'📍 '+tr('مقترح'))),
+                React.createElement('span',{style:{display:'flex',alignItems:'center'}},React.createElement('span',{className:'st-dot '+(stClass[mc.status]||'st-off')}),statusLabel(mc.status)));
+            })),
+        role==='admin'&&assigned&&React.createElement('div',{className:'card',style:{marginBottom:12,display:'flex',alignItems:'center',gap:10}},
+          React.createElement('span',{style:{fontSize:20}},'🔧'),
+          React.createElement('div',{style:{flex:1}},React.createElement('div',{style:{fontSize:11,color:'var(--muted)'}},tr('الميكانيكي المعيّن')),React.createElement('div',{style:{fontSize:14,fontWeight:800}},req.mechanic_name))),
+        role==='admin'&&req.status==='done'&&req.payment_status==='submitted'&&React.createElement('div',{className:'card'},
+          React.createElement('div',{style:{fontSize:13,fontWeight:800,color:'var(--orange)',marginBottom:8}},'💰 '+tr('مراجعة وصل الدفع')),
+          req.receipt_url&&React.createElement('img',{src:req.receipt_url,onClick:()=>window.open(req.receipt_url,'_blank'),style:{width:'100%',maxHeight:200,objectFit:'cover',borderRadius:10,marginBottom:10,cursor:'pointer'}}),
+          React.createElement('div',{className:'field'},React.createElement('label',{className:'label'},tr('المبلغ المستلم (اختياري)')),
+            React.createElement('input',{className:'input',inputMode:'numeric',value:amount,onChange:e=>setAmount(e.target.value.replace(/[^0-9]/g,'')),placeholder:tr('أوقية')})),
+          React.createElement('button',{className:'btn btn-primary',onClick:()=>onConfirmPay(req,amount)},'✅ '+tr('تأكيد الدفع'))),
+        role==='admin'&&req.status==='done'&&req.payment_status==='paid'&&React.createElement('div',{style:{textAlign:'center'}},React.createElement('span',{className:'badge badge-green'},'✅ '+tr('مدفوع'))),
+        role==='mechanic'&&next&&React.createElement('button',{className:'btn btn-primary',onClick:()=>onSetStatus(req,next.to)},
+          (next.to==='active'?'🚗 ':next.to==='arrived'?'📍 ':'✅ ')+tr(next.label)),
+        role==='mechanic'&&req.status==='done'&&React.createElement('div',{style:{textAlign:'center'}},React.createElement('span',{className:'badge badge-green'},'✅ '+tr('تم إنجاز العمل'))))));
+}
+// ── Skeleton loader ───────────────────────────────────────────
+function Skeleton({n=3}){
+  return React.createElement('div',{className:'scroll pad fade-in'},
+    Array.from({length:n}).map((_,i)=>React.createElement('div',{key:i,className:'skel-card'},
+      React.createElement('div',{className:'skel skel-line',style:{width:'42%',height:14}}),
+      React.createElement('div',{className:'skel skel-line',style:{width:'82%'}}),
+      React.createElement('div',{className:'skel skel-line',style:{width:'60%',marginBottom:0}}))));
+}
+// ── Mechanics list (shared) ───────────────────────────────────
+function MechanicsList(){
+  const [list,setList]=useState(null);
+  useEffect(()=>{if(!sb){setList([]);return;}sb.from('app_users').select('id,name,phone,photo_url,status').eq('role','mechanic').order('created_at',{ascending:true}).then(({data})=>setList(data||[]));},[]);
+  if(list===null) return React.createElement(Skeleton,{n:4});
+  return React.createElement('div',{className:'scroll pad fade-in'},
+    React.createElement('div',{className:'card'},
+      React.createElement('div',{className:'section-title'},tr('الميكانيكيون')+' ('+list.length+')'),
+      list.length===0?React.createElement('div',{className:'hint'},tr('لا يوجد ميكانيكيون'))
+      :list.map(m=>React.createElement('div',{key:m.id,className:'mech-row'},
+        React.createElement('div',{className:'mech-av'},m.photo_url?React.createElement('img',{src:m.photo_url}):'🔧'),
+        React.createElement('div',{style:{flex:1}},
+          React.createElement('div',{style:{fontSize:15,fontWeight:800}},m.name),
+          React.createElement('div',{style:{fontSize:12,color:'var(--muted)',marginTop:2}},React.createElement('span',{className:'st-dot '+(stClass[m.status]||'st-off')}),statusLabel(m.status))),
+        React.createElement('a',{className:'call-btn',href:'tel:'+m.phone},'📞')))));
+}
+
+
+// ── Request card (compact, shared) ────────────────────────────
+const REQ_ST={pending:['badge-muted','قيد الانتظار'],active:['badge-orange','الميكانيكي قادم'],arrived:['badge-orange','وصل الميكانيكي'],done:['badge-green','تم إنجاز العمل']};
+function ReqCard({r,onClick}){
+  const media=Array.isArray(r.media)?r.media:[];
+  const st=REQ_ST[r.status]||['badge-muted','—'];
+  return React.createElement('div',{className:'req-card',onClick},
+    React.createElement('div',{className:'req-top'},
+      React.createElement('div',{className:'req-name'},r.client_name),
+      React.createElement('span',{className:'badge '+(r.tier==='premium'?'badge-orange':'badge-muted')},r.tier==='premium'?'⚡':'🔧')),
+    React.createElement('div',{className:'req-meta'},
+      React.createElement('span',null,'📞 '+r.client_phone),
+      r.location&&React.createElement('span',null,'📍 '+(r.location.length>22?r.location.slice(0,22)+'…':r.location))),
+    media.length>0&&React.createElement('div',{className:'mediabar'},
+      media.slice(0,4).map((m,i)=>m.type==='image'?React.createElement('img',{key:i,src:m.url}):React.createElement('video',{key:i,src:m.url,muted:true}))),
+    React.createElement('div',{style:{display:'flex',alignItems:'center',gap:8,marginTop:10}},
+      React.createElement('span',{className:'badge '+st[0]},tr(st[1])),
+      r.mechanic_name&&React.createElement('span',{style:{fontSize:11,color:'var(--muted)'}},'🔧 '+r.mechanic_name),
+      r.status==='done'&&r.payment_status==='submitted'&&React.createElement('span',{className:'badge badge-orange'},'💰'),
+      r.status==='done'&&r.payment_status==='paid'&&React.createElement('span',{className:'badge badge-green'},'✅')));
+}
+// ── Admin requests ────────────────────────────────────────────
+function AdminRequests({showToast}){
+  const [reqs,setReqs]=useState([]);const [mechs,setMechs]=useState([]);
+  const [tab,setTab]=useState('new');const [sel,setSel]=useState(null);const [q,setQ]=useState('');
+  const known=useRef(null);
+  const load=useCallback(()=>{if(!sb)return;
+    sb.from('brcc_requests').select('*').order('created_at',{ascending:false}).then(({data})=>{
+      setReqs(data||[]);
+      const ids=new Set((data||[]).map(r=>r.id));
+      if(known.current!==null){for(const r of (data||[])){if(!known.current.has(r.id)){haptic([30,50,120]);showToast('🆘 '+tr('طلب جديد وصل'));break;}}}
+      known.current=ids;
+    });
+    sb.from('app_users').select('id,name,phone,status,zone').eq('role','mechanic').then(({data})=>setMechs(data||[]));
+  },[showToast]);
+  useEffect(()=>{load();if(!sb)return;const ch=sb.channel('admin-reqs').on('postgres_changes',{event:'*',schema:'public',table:'brcc_requests'},()=>load()).subscribe();return()=>sb.removeChannel(ch);},[load]);
+  const filt={new:reqs.filter(r=>r.status==='pending'&&!r.mechanic_id),ongoing:reqs.filter(r=>r.mechanic_id&&r.status!=='done'),done:reqs.filter(r=>r.status==='done')};
+  const assign=async(req,mc)=>{await sb.from('brcc_requests').update({mechanic_id:mc.id,mechanic_name:mc.name,mechanic_phone:mc.phone}).eq('id',req.id);haptic(30);showToast('✅ '+tr('تم التعيين'));
+    try{pushNotify(mc.id,'📣 مهمة جديدة',(req.client_name||'')+' — '+(req.zone||req.location||''));}catch(e){}
+    waMechanic(req,mc);setSel(null);load();};
+  const confirmPay=async(req,amount)=>{const patch={payment_status:'paid'};if(amount&&Number(amount)>0)patch.amount=Number(amount);await sb.from('brcc_requests').update(patch).eq('id',req.id);haptic(30);showToast('✅ '+tr('تم تأكيد الدفع بنجاح'));setSel(null);load();};
+  useEffect(()=>{if(!sel)return;const f=reqs.find(r=>r.id===sel.id);if(f)setSel(f);},[reqs]);
+  const tabs=[['new','طلبات جديدة'],['ongoing','قيد التنفيذ'],['done','مكتملة']];
+  const list=filt[tab].filter(r=>!q.trim()||(((r.client_name||'')+' '+(r.client_phone||'')+' '+(r.mechanic_name||'')+' '+(r.location||'')).toLowerCase().includes(q.trim().toLowerCase())));
+  return React.createElement('div',{className:'scroll pad fade-in'},
+    React.createElement('div',{className:'tabs'},tabs.map(([id,lb])=>React.createElement('button',{key:id,className:'tab'+(tab===id?' on':''),onClick:()=>setTab(id)},
+      tr(lb),filt[id].length>0&&React.createElement('span',{className:'cnt'},filt[id].length)))),
+    React.createElement('input',{className:'search-box',value:q,onChange:e=>setQ(e.target.value),placeholder:tr('بحث بالاسم أو الرقم')}),
+    list.length===0?React.createElement('div',{className:'hint',style:{textAlign:'center',padding:30}},tr('لا توجد طلبات'))
+      :list.map(r=>React.createElement(ReqCard,{key:r.id,r,onClick:()=>setSel(r)})),
+    sel&&React.createElement(RequestDetail,{req:sel,role:'admin',mechanics:mechs,onAssign:assign,onConfirmPay:confirmPay,onClose:()=>setSel(null),showToast}));
+}
+// ── Mechanic tasks ────────────────────────────────────────────
+function MechanicTasks({user,onUpdate,showToast}){
+  const [reqs,setReqs]=useState([]);const [sel,setSel]=useState(null);const [status,setStatus]=useState(user.status||'available');
+  const known=useRef(null);
+  const load=useCallback(()=>{if(!sb)return;sb.from('brcc_requests').select('*').eq('mechanic_id',user.id).neq('status','done').order('created_at',{ascending:false}).then(({data})=>{
+    setReqs(data||[]);const ids=new Set((data||[]).map(r=>r.id));
+    if(known.current!==null){for(const r of (data||[])){if(!known.current.has(r.id)){haptic([30,50,120]);showToast('📣 '+tr('مهمة جديدة لك'));break;}}}
+    known.current=ids;
+  });},[user.id,showToast]);
+  useEffect(()=>{load();if(!sb)return;const ch=sb.channel('mech-tasks-'+user.id).on('postgres_changes',{event:'*',schema:'public',table:'brcc_requests',filter:'mechanic_id=eq.'+user.id},()=>load()).subscribe();return()=>sb.removeChannel(ch);},[load,user.id]);
+  const setMyStatus=async(s)=>{setStatus(s);if(sb)await sb.from('app_users').update({status:s}).eq('id',user.id);onUpdate({status:s});haptic(15);};
+  const setReqStatus=async(req,to)=>{if(sb)await sb.from('brcc_requests').update({status:to}).eq('id',req.id);haptic(30);showToast('✅');setSel(null);load();};
+  const activeId=(reqs.find(r=>r.status==='active'||r.status==='arrived')||{}).id;
+  useEffect(()=>{
+    if(!sb||!activeId||!navigator.geolocation)return;let last=0;
+    const id=navigator.geolocation.watchPosition(pos=>{const now=Date.now();if(now-last<7000)return;last=now;
+      sb.from('brcc_requests').update({mechanic_lat:pos.coords.latitude,mechanic_lng:pos.coords.longitude,mechanic_updated_at:new Date().toISOString()}).eq('id',activeId);},
+      ()=>{},{enableHighAccuracy:true,maximumAge:5000,timeout:15000});
+    return()=>navigator.geolocation.clearWatch(id);
+  },[activeId]);
+  useEffect(()=>{if(!sel)return;const f=reqs.find(r=>r.id===sel.id);if(f)setSel(f);},[reqs]);
+  return React.createElement('div',{className:'scroll pad fade-in'},
+    React.createElement('div',{className:'card',style:{marginBottom:14}},
+      React.createElement('div',{style:{fontSize:13,fontWeight:800,marginBottom:6}},tr('حالتي')),
+      React.createElement('div',{className:'status-pick'},MECH_STATUSES.map(([id,lb])=>React.createElement('button',{key:id,className:'status-chip'+(status===id?' on':''),onClick:()=>setMyStatus(id)},
+        React.createElement('span',{className:'st-dot '+(stClass[id])}),tr(lb))))),
+    reqs.length===0?React.createElement('div',{className:'hint',style:{textAlign:'center',padding:30}},tr('لا توجد مهام'))
+      :reqs.map(r=>React.createElement(ReqCard,{key:r.id,r,onClick:()=>setSel(r)})),
+    sel&&React.createElement(RequestDetail,{req:sel,role:'mechanic',onSetStatus:setReqStatus,onClose:()=>setSel(null),showToast,me:user}));
+}
+// ── Mechanic history ──────────────────────────────────────────
+function MechanicHistory({user}){
+  const [reqs,setReqs]=useState(null);const [sel,setSel]=useState(null);
+  useEffect(()=>{if(!sb){setReqs([]);return;}sb.from('brcc_requests').select('*').eq('mechanic_id',user.id).eq('status','done').order('created_at',{ascending:false}).then(({data})=>setReqs(data||[]));},[user.id]);
+  if(reqs===null)return React.createElement(Skeleton,{n:3});
+  return React.createElement('div',{className:'scroll pad fade-in'},
+    reqs.length===0?React.createElement('div',{className:'hint',style:{textAlign:'center',padding:30}},tr('لا توجد مهام'))
+      :reqs.map(r=>React.createElement(ReqCard,{key:r.id,r,onClick:()=>setSel(r)})),
+    sel&&React.createElement(RequestDetail,{req:sel,role:'mechanic',onSetStatus:()=>{},onClose:()=>setSel(null),showToast:()=>{}}));
+}
+// ── Admin & Mechanic shells ───────────────────────────────────
+function RoleShell({user,onLogout,onUpdate,lang,onLang,showToast,items,title,render}){
+  const [page,setPage]=useState(items[0].id);
+  return React.createElement('div',{className:'app'},
+    React.createElement('div',{className:'topbar'},
+      React.createElement('div',{className:'topbar-brand'},
+        React.createElement('img',{src:'najda-logo-icon.svg'}),
+        React.createElement('div',null,React.createElement('div',{className:'tt'},tr(title)),React.createElement('div',{className:'ts'},'BRCC AUTO'))),
+      React.createElement(LangSwitcher,{lang,onLang})),
+    render(page),
+    React.createElement(BottomNav,{items,active:page,onNav:setPage}));
+}
+function AdminShell(props){
+  const items=[{id:'requests',icon:'📋',label:'الطلبات'},{id:'mechanics',icon:'🔧',label:'الميكانيكيون'},{id:'clients',icon:'➕',label:'العميل'},{id:'account',icon:'⚙️',label:'حسابي'}];
+  const render=(page)=> page==='account'?React.createElement(Settings,{user:props.user,onLogout:props.onLogout,onUpdate:props.onUpdate,showToast:props.showToast})
+    :page==='mechanics'?React.createElement(MechanicsList,null)
+    :page==='clients'?React.createElement(CreateClient,{showToast:props.showToast})
+    :React.createElement(AdminRequests,{showToast:props.showToast});
+  return React.createElement(RoleShell,Object.assign({},props,{items,title:'لوحة الإدارة BRCC',render}));
+}
+function MechanicShell(props){
+  const items=[{id:'tasks',icon:'🧰',label:'مهامي'},{id:'mechanics',icon:'🔧',label:'الميكانيكيون'},{id:'history',icon:'🕓',label:'السجل'},{id:'account',icon:'⚙️',label:'حسابي'}];
+  const render=(page)=> page==='account'?React.createElement(Settings,{user:props.user,onLogout:props.onLogout,onUpdate:props.onUpdate,showToast:props.showToast})
+    :page==='mechanics'?React.createElement(MechanicsList,null)
+    :page==='history'?React.createElement(MechanicHistory,{user:props.user})
+    :React.createElement(MechanicTasks,{user:props.user,onUpdate:props.onUpdate,showToast:props.showToast});
+  return React.createElement(RoleShell,Object.assign({},props,{items,title:'الميكانيكي',render}));
+}
+
+
+
+// ── Report export (Excel via SheetJS, PDF via print view) ─────
+const STLBL={pending:'قيد الانتظار',active:'الميكانيكي قادم',arrived:'وصل الميكانيكي',done:'تم إنجاز العمل'};
+function fmtDate(s){try{return s?new Date(s).toLocaleDateString('fr-FR'):'-';}catch(e){return '-';}}
+function exportExcel(reqs,showToast){
+  try{
+    if(typeof XLSX==='undefined'){showToast('⚠️ XLSX');return;}
+    const rows=reqs.map(r=>({
+      'التاريخ':fmtDate(r.created_at),
+      'العميل':r.client_name||'-',
+      'الهاتف':r.client_phone||'-',
+      'المنطقة':r.zone||'-',
+      'المستوى':r.tier==='premium'?'مميّزة':'عادية',
+      'الميكانيكي':r.mechanic_name||'-',
+      'الحالة':STLBL[r.status]||r.status||'-',
+      'وسيلة الدفع':((PAY_METHODS.find(m=>m.id===r.payment_method)||{}).name)||'-',
+      'حالة الدفع':r.payment_status==='paid'?'مدفوع':(r.payment_status==='submitted'?'بانتظار التأكيد':'غير مدفوع'),
+      'المبلغ':Number(r.amount)||0,
+      'التقييم':r.rating||'',
+      'المراجعة':r.review||''
+    }));
+    const ws=XLSX.utils.json_to_sheet(rows);
+    const wb=XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb,ws,'Requests');
+    XLSX.writeFile(wb,'BRCC_Report_'+new Date().toISOString().slice(0,10)+'.xlsx');
+    haptic(20);showToast('✅ '+tr('تم التصدير'));
+  }catch(e){console.error(e);showToast('⚠️ '+(e.message||'error'));}
+}
+function exportPDF(d,stats){
+  try{
+    const {reqs}=d;
+    const esc=s=>String(s==null?'':s).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+    const rows=reqs.map(r=>'<tr><td>'+fmtDate(r.created_at)+'</td><td>'+esc(r.client_name)+'</td><td>'+esc(r.zone||'-')
+      +'</td><td>'+(r.tier==='premium'?'مميّزة':'عادية')+'</td><td>'+esc(r.mechanic_name||'-')+'</td><td>'+esc(STLBL[r.status]||r.status)
+      +'</td><td>'+(Number(r.amount)||0).toLocaleString()+'</td><td>'+(r.rating?('⭐'+r.rating):'-')+'</td></tr>').join('');
+    const html='<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="UTF-8"/><title>BRCC Report</title>'
+      +'<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet"/>'
+      +'<style>body{font-family:Cairo,sans-serif;padding:26px;color:#14171C}h1{font-size:20px;margin:0}'
+      +'.sub{color:#666;font-size:12px;margin:4px 0 18px}.g{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:18px}'
+      +'.m{border:1px solid #ddd;border-radius:10px;padding:10px 14px;min-width:110px}.m b{display:block;font-size:18px}'
+      +'.m span{font-size:11px;color:#666}table{width:100%;border-collapse:collapse;font-size:11px}'
+      +'th,td{border:1px solid #ddd;padding:6px;text-align:center}th{background:#0E2340;color:#fff}'
+      +'tr:nth-child(even){background:#f7f8fa}.f{margin-top:18px;font-size:10px;color:#888;text-align:center}'
+      +'@media print{.noprint{display:none}}</style></head><body>'
+      +'<h1>AL Najda Auto BRCC — تقرير الأداء والمداخيل</h1>'
+      +'<div class="sub">تاريخ التقرير: '+new Date().toLocaleDateString('fr-FR')+'</div>'
+      +'<div class="g">'
+      +'<div class="m"><b>'+stats.total+'</b><span>إجمالي الطلبات</span></div>'
+      +'<div class="m"><b>'+stats.done+'</b><span>مكتملة</span></div>'
+      +'<div class="m"><b>'+stats.revenue.toLocaleString()+' أوقية</b><span>المداخيل</span></div>'
+      +'<div class="m"><b>'+stats.avgJob.toLocaleString()+' أوقية</b><span>متوسط المهمة</span></div>'
+      +'<div class="m"><b>'+stats.clients+'</b><span>العملاء</span></div>'
+      +'<div class="m"><b>'+stats.mechs+'</b><span>الميكانيكيون</span></div></div>'
+      +'<table><thead><tr><th>التاريخ</th><th>العميل</th><th>المنطقة</th><th>المستوى</th><th>الميكانيكي</th><th>الحالة</th><th>المبلغ</th><th>التقييم</th></tr></thead>'
+      +'<tbody>'+rows+'</tbody></table>'
+      +'<div class="f">A Planet T&amp;L SUARL © 2026 — AL Najda Auto BRCC</div>'
+      +'<div class="noprint" style="text-align:center;margin-top:20px"><button onclick="window.print()" style="padding:10px 20px;font-size:14px;font-family:Cairo;background:#FF6A00;color:#fff;border:none;border-radius:8px;cursor:pointer">🖨️ طباعة / حفظ PDF</button></div>'
+      +'<script>setTimeout(function(){window.print();},600);<\/script></body></html>';
+    const w=window.open('','_blank');
+    if(!w){alert('⚠️ Popup blocked');return;}
+    w.document.write(html);w.document.close();haptic(20);
+  }catch(e){console.error(e);}
+}
+
+// ── Developer analytics panel (A Planet) ──────────────────────
+function DevPanel({showToast}){
+  const [d,setD]=useState(null);
+  useEffect(()=>{if(!sb){setD({users:[],reqs:[]});return;}
+    Promise.all([sb.from('app_users').select('id,role,name,status'),sb.from('brcc_requests').select('*')])
+      .then(([u,r])=>setD({users:u.data||[],reqs:r.data||[]}));},[]);
+  if(!d)return React.createElement(Skeleton,{n:5});
+  const {users,reqs}=d;
+  const clients=users.filter(u=>u.role==='client').length;
+  const mechs=users.filter(u=>u.role==='mechanic');
+  const total=reqs.length,done=reqs.filter(r=>r.status==='done').length;
+  const ongoing=reqs.filter(r=>r.mechanic_id&&r.status!=='done').length;
+  const pending=reqs.filter(r=>r.status==='pending'&&!r.mechanic_id).length;
+  const paid=reqs.filter(r=>r.payment_status==='paid');
+  const revenue=paid.reduce((s,r)=>s+(Number(r.amount)||0),0);
+  const nowD=new Date();const sDay=new Date(nowD);sDay.setHours(0,0,0,0);
+  const sWeek=new Date(sDay);sWeek.setDate(sWeek.getDate()-sDay.getDay());
+  const sMonth=new Date(nowD.getFullYear(),nowD.getMonth(),1);
+  const rev=(from)=>paid.filter(r=>r.created_at&&new Date(r.created_at)>=from).reduce((s,r)=>s+(Number(r.amount)||0),0);
+  const revToday=rev(sDay),revWeek=rev(sWeek),revMonth=rev(sMonth);
+  const paidAmt=paid.filter(r=>Number(r.amount)>0);
+  const avgJob=paidAmt.length?Math.round(revenue/paidAmt.length):0;
+  const premium=reqs.filter(r=>r.tier==='premium').length,normal=reqs.filter(r=>r.tier==='normal').length;
+  const pm=PAY_METHODS.map(m=>[m,reqs.filter(r=>r.payment_method===m.id).length]).filter(x=>x[1]>0);
+  const pmMax=Math.max(1,...pm.map(x=>x[1]));
+  const mlead=mechs.map(m=>{const my=reqs.filter(r=>r.mechanic_id===m.id&&r.status==='done');const rated=my.filter(r=>r.rating);const avg=rated.length?(rated.reduce((s,r)=>s+r.rating,0)/rated.length):0;return {...m,cnt:my.length,avg};}).sort((a,b)=>b.cnt-a.cnt).slice(0,6);
+  const mMax=Math.max(1,...mlead.map(m=>m.cnt));
+  const days=[];for(let i=6;i>=0;i--){const dt=new Date();dt.setDate(dt.getDate()-i);const key=dt.toISOString().slice(0,10);
+    days.push({lb:['أحد','إثن','ثلا','أرب','خمي','جمع','سبت'][dt.getDay()],c:reqs.filter(r=>(r.created_at||'').slice(0,10)===key).length});}
+  const dMax=Math.max(1,...days.map(x=>x.c));
+  const metric=(v,l,cls)=>React.createElement('div',{className:'metric'+(cls?' '+cls:'')},React.createElement('div',{className:'mv'},v),React.createElement('div',{className:'ml'},tr(l)));
+  const barRow=(lb,val,max)=>React.createElement('div',{className:'bar-row',key:lb},
+    React.createElement('div',{className:'bar-lb'},lb),
+    React.createElement('div',{className:'bar-track'},React.createElement('div',{className:'bar-fill',style:{width:Math.round(val/max*100)+'%'}})),
+    React.createElement('div',{className:'bar-val'},val));
+  return React.createElement('div',{className:'scroll pad fade-in'},
+    React.createElement('div',{className:'dev-hd'},
+      React.createElement('div',{style:{fontSize:13,fontWeight:900,color:'var(--yellow)',letterSpacing:1}},'A PLANET T&L SUARL'),
+      React.createElement('div',{style:{fontSize:11,color:'var(--muted)',marginTop:3}},tr('نظرة عامة')+' · AL Najda Auto BRCC')),
+    total===0&&clients===0?React.createElement('div',{className:'hint',style:{textAlign:'center',padding:20}},tr('لا توجد بيانات بعد')):null,
+    React.createElement('div',{className:'metric-grid'},
+      metric(total,'إجمالي الطلبات','hl'),
+      metric(done,'مكتملة'),
+      metric(ongoing+pending,'قيد التنفيذ'),
+      metric(mechs.length,'الميكانيكيون'),
+      metric(clients,'العملاء'),
+      metric(paid.length,'المعاملات المدفوعة')),
+    React.createElement('div',{className:'metric gold',style:{marginBottom:14}},
+      React.createElement('div',{className:'mv'},revenue.toLocaleString()+' '+tr('أوقية')),
+      React.createElement('div',{className:'ml'},tr('المداخيل'))),
+    revenue>0&&React.createElement('div',{className:'card',style:{marginBottom:14}},
+      React.createElement('div',{style:{display:'flex',gap:8,textAlign:'center'}},
+        [['اليوم',revToday],['هذا الأسبوع',revWeek],['هذا الشهر',revMonth]].map(([l,v])=>React.createElement('div',{key:l,style:{flex:1}},
+          React.createElement('div',{style:{fontSize:16,fontWeight:900,color:'var(--yellow)'}},v.toLocaleString()),
+          React.createElement('div',{style:{fontSize:10,color:'var(--muted)',marginTop:2}},tr(l))))),
+      React.createElement('div',{style:{textAlign:'center',fontSize:11,color:'var(--muted)',marginTop:10,borderTop:'1px solid var(--line)',paddingTop:8}},tr('متوسط المهمة')+': '+avgJob.toLocaleString()+' '+tr('أوقية'))),
+    React.createElement('div',{className:'card',style:{marginBottom:14}},
+      React.createElement('div',{className:'section-title'},'📄 '+tr('تصدير التقارير')),
+      React.createElement('div',{style:{display:'flex',gap:9}},
+        React.createElement('button',{className:'btn btn-yellow',onClick:()=>exportExcel(reqs,showToast||(()=>{}))},'📊 '+tr('تصدير Excel')),
+        React.createElement('button',{className:'btn btn-outline',onClick:()=>exportPDF(d,{total,done,revenue,avgJob,clients,mechs:mechs.length})},'📄 '+tr('تصدير PDF')))),
+    React.createElement('div',{className:'card',style:{marginBottom:14}},
+      React.createElement('div',{className:'section-title'},tr('الطلبات آخر 7 أيام')),
+      React.createElement('div',{className:'day-chart'},
+        days.map((x,i)=>React.createElement('div',{className:'day-col',key:i},
+          React.createElement('div',{style:{fontSize:10,fontWeight:800,color:x.c?'var(--orange)':'var(--muted)'}},x.c||''),
+          React.createElement('div',{className:'day-bar',style:{height:Math.round(x.c/dMax*72)+2+'px'}}),
+          React.createElement('div',{className:'day-lb'},x.lb))))),
+    React.createElement('div',{className:'card',style:{marginBottom:14}},
+      React.createElement('div',{className:'section-title'},tr('حسب المستوى')),
+      barRow(tr('عادية'),normal,Math.max(1,normal,premium)),
+      barRow(tr('مميزة'),premium,Math.max(1,normal,premium))),
+    pm.length>0&&React.createElement('div',{className:'card',style:{marginBottom:14}},
+      React.createElement('div',{className:'section-title'},tr('وسائل الدفع')),
+      pm.map(([m,c])=>barRow(tr(m.name),c,pmMax))),
+    React.createElement('div',{className:'card'},
+      React.createElement('div',{className:'section-title'},tr('أداء الميكانيكيين')),
+      mlead.length===0?React.createElement('div',{className:'hint'},tr('لا يوجد ميكانيكيون'))
+      :mlead.map(m=>React.createElement('div',{className:'bar-row',key:m.id},
+        React.createElement('div',{className:'bar-lb'},'🔧 '+m.name+(m.avg?(' · '+m.avg.toFixed(1)+'⭐'):'')),
+        React.createElement('div',{className:'bar-track'},React.createElement('div',{className:'bar-fill',style:{width:Math.round(m.cnt/mMax*100)+'%'}})),
+        React.createElement('div',{className:'bar-val'},m.cnt)))));
+}
+
+// ── Developer panel ───────────────────────────────────────────
+function DevGate({onBack,showToast}){
+  const [ph,setPh]=useState('');const [pw,setPw]=useState('');const [ok,setOk]=useState(false);
+  const login=()=>{if(ph.trim()===DEV_PHONE&&pw===DEV_PASS){haptic(30);setOk(true);}else showToast('❌ '+tr('بيانات الدخول غير صحيحة'));};
+  if(ok) return React.createElement('div',{className:'app fade-in'},
+    React.createElement('div',{className:'topbar'},
+      React.createElement('button',{className:'btn-sm btn-ghost',onClick:onBack},'←'),
+      React.createElement('div',{style:{fontSize:15,fontWeight:800}},tr('لوحة المطوّر')),
+      React.createElement('div',{style:{width:34}})),
+    React.createElement(DevPanel,{showToast}));
+  return React.createElement('div',{className:'app fade-in'},
+    React.createElement('div',{className:'topbar'},
+      React.createElement('button',{className:'btn-sm btn-ghost',onClick:onBack},'←'),
+      React.createElement('div',{style:{fontSize:15,fontWeight:800}},tr('دخول المطوّر')),
+      React.createElement('div',{style:{width:34}})),
+    React.createElement('div',{className:'scroll pad'},
+      React.createElement('div',{className:'card'},
+        React.createElement('div',{style:{textAlign:'center',fontSize:12,color:'var(--yellow)',fontWeight:800,marginBottom:14}},'A PLANET T&L SUARL'),
+        React.createElement('div',{className:'field'},React.createElement('label',{className:'label'},tr('رقم الهاتف')),
+          React.createElement('input',{className:'input',value:ph,onChange:e=>setPh(e.target.value)})),
+        React.createElement('div',{className:'field'},React.createElement('label',{className:'label'},tr('كلمة المرور')),
+          React.createElement('input',{className:'input',type:'password',value:pw,onChange:e=>setPw(e.target.value),onKeyDown:e=>e.key==='Enter'&&login()})),
+        React.createElement('button',{className:'btn btn-primary',onClick:login},tr('دخول')))));
+}
+// ── PWA install banner ────────────────────────────────────────
+function InstallBanner({mode,onInstall,onDismiss}){
+  const ic=React.createElement('img',{src:'najda-icon-192.png',alt:''});
+  const t=React.createElement('div',{className:'ib-t'},tr('ثبّت التطبيق'));
+  if(mode==='ios') return React.createElement('div',{className:'install-banner'},ic,
+    React.createElement('div',{style:{flex:1}},t,React.createElement('div',{className:'ib-s'},tr('للتثبيت: اضغط المشاركة ⬆️ ثم «أضف إلى الشاشة الرئيسية»'))),
+    React.createElement('button',{className:'ib-x',onClick:onDismiss},'✕'));
+  return React.createElement('div',{className:'install-banner'},ic,
+    React.createElement('div',{style:{flex:1}},t,React.createElement('div',{className:'ib-s'},tr('أضِفه إلى شاشتك الرئيسية للوصول السريع'))),
+    React.createElement('button',{className:'ib-b',onClick:onInstall},tr('📲 تثبيت')),
+    React.createElement('button',{className:'ib-x',onClick:onDismiss},'✕'));
+}
+// ── App ───────────────────────────────────────────────────────
+function App(){
+  const [lang,setLang]=useState(LANG);
+  const changeLang=l=>{applyLang(l);setLang(l);};
+  const [toast,showToast]=useToast();
+  const [stage,setStage]=useState('splash');
+  const [role,setRole]=useState(null);
+  const [user,setUser]=useState(null);
+  const [installMode,setInstallMode]=useState(null);
+  useEffect(()=>{
+    const s=loadSession();
+    if(s&&s.id&&sb){sb.from('app_users').select('*').eq('id',s.id).maybeSingle().then(({data})=>{if(data){setUser(data);setStage('app');}else{clearSession();setStage('landing');}});}
+    else{const t=setTimeout(()=>setStage('landing'),1100);return()=>clearTimeout(t);}
+  },[]);
+  useEffect(()=>{
+    let dismissed=false;try{dismissed=localStorage.getItem('brcc_install_dismiss')==='1';}catch(e){}
+    const standalone=(window.matchMedia&&window.matchMedia('(display-mode: standalone)').matches)||window.navigator.standalone===true;
+    if(standalone||dismissed)return;
+    if(deferredPrompt)setInstallMode('prompt');
+    const onI=()=>setInstallMode('prompt');window.addEventListener('brcc-installable',onI);
+    const onInst=()=>{deferredPrompt=null;setInstallMode(null);};window.addEventListener('appinstalled',onInst);
+    const ua=navigator.userAgent||'';const isIOS=/iphone|ipad|ipod/i.test(ua);const isSafari=/safari/i.test(ua)&&!/crios|fxios|edgios/i.test(ua);
+    let tmr=null;if(isIOS&&isSafari&&!deferredPrompt)tmr=setTimeout(()=>setInstallMode(m=>m||'ios'),2600);
+    return()=>{window.removeEventListener('brcc-installable',onI);window.removeEventListener('appinstalled',onInst);if(tmr)clearTimeout(tmr);};
+  },[]);
+  const doInstall=async()=>{if(!deferredPrompt){setInstallMode(null);return;}deferredPrompt.prompt();try{await deferredPrompt.userChoice;}catch(e){}deferredPrompt=null;setInstallMode(null);};
+  const dismissInstall=()=>{setInstallMode(null);try{localStorage.setItem('brcc_install_dismiss','1');}catch(e){}};
+  const onAuth=u=>{setUser(u);setStage('app');};
+  const onLogout=()=>{clearSession();setUser(null);setRole(null);setStage('landing');};
+  const onUpdate=patch=>setUser(p=>({...p,...patch}));
+  let view;
+  if(stage==='splash') view=React.createElement(Splash,null);
+  else if(stage==='app'&&user) view=React.createElement({client:ClientShell,admin:AdminShell,mechanic:MechanicShell}[user.role]||Shell,{user,onLogout,onUpdate,lang,onLang:changeLang,showToast});
+  else if(stage==='role') view=React.createElement(RoleGate,{onPick:r=>{setRole(r);setStage('auth');},onBack:()=>setStage('landing')});
+  else if(stage==='auth') view=React.createElement(AuthScreen,{role,onAuth,onBack:()=>setStage('role'),showToast});
+  else if(stage==='dev') view=React.createElement(DevGate,{onBack:()=>setStage('landing'),showToast});
+  else view=React.createElement(Landing,{onEnter:()=>setStage('role'),onDev:()=>setStage('dev'),lang,onLang:changeLang});
+  return React.createElement(React.Fragment,null,view,React.createElement(Toast,{msg:toast}),
+    installMode&&stage!=='splash'&&React.createElement(InstallBanner,{mode:installMode,onInstall:doInstall,onDismiss:dismissInstall}));
+}
+ReactDOM.render(React.createElement(App),document.getElementById('root'));
+</script>
+</body>
+</html>
